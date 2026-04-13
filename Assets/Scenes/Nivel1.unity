@@ -1072,7 +1072,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4ddbfd0487956744a2bc3e0af3ec00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
-  moveSpeed: 5
+  moveSpeed: 3
 --- !u!95 &1166922726
 Animator:
   serializedVersion: 7
