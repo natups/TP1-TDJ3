@@ -13,6 +13,7 @@ public class MovimientoJugador : MonoBehaviour
 
     void Update()
     {
+        // Input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
@@ -20,8 +21,19 @@ public class MovimientoJugador : MonoBehaviour
         if (movement.x != 0)
             movement.y = 0;
 
+        // parámetros de movimiento
         animator.SetFloat("MoveX", movement.x);
         animator.SetFloat("MoveY", movement.y);
+
+        // velocidad (para saber si está quieto o no)
+        animator.SetFloat("Speed", movement.sqrMagnitude);
+
+        // 🔥 GUARDAR ÚLTIMA DIRECCIÓN
+        if (movement != Vector2.zero)
+        {
+            animator.SetFloat("LastX", movement.x);
+            animator.SetFloat("LastY", movement.y);
+        }
     }
 
     void FixedUpdate()

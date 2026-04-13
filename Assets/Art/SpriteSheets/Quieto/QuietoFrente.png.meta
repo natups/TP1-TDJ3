@@ -5,6 +5,12 @@ TextureImporter:
   - first:
       213: 56765564375766265
     second: QuietoFrente_0
+  - first:
+      213: 2408486770826554817
+    second: QuietoFrente_1
+  - first:
+      213: -2471146479899550309
+    second: QuietoFrente_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -134,6 +140,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: QuietoFrente_1
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 2
+        width: 21
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cd285515f9ac6120800000000000000
+      internalID: 2408486770826554817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: QuietoFrente_2
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 2
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9d51a58e59b4bdd0800000000000000
+      internalID: -2471146479899550309
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -149,6 +199,8 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       QuietoFrente_0: 56765564375766265
+      QuietoFrente_1: 2408486770826554817
+      QuietoFrente_2: -2471146479899550309
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

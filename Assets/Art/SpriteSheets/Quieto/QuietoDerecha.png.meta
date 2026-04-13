@@ -5,6 +5,12 @@ TextureImporter:
   - first:
       213: -5655043037847910714
     second: QuietoDerecha_0
+  - first:
+      213: 354207580726440808
+    second: QuietoDerecha_1
+  - first:
+      213: -552457028552754739
+    second: QuietoDerecha_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -134,6 +140,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: QuietoDerecha_1
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 2
+        width: 15
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86333f10be56ae400800000000000000
+      internalID: 354207580726440808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: QuietoDerecha_2
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 2
+        width: 15
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc9f17372474558f0800000000000000
+      internalID: -552457028552754739
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -149,6 +199,8 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       QuietoDerecha_0: -5655043037847910714
+      QuietoDerecha_1: 354207580726440808
+      QuietoDerecha_2: -552457028552754739
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

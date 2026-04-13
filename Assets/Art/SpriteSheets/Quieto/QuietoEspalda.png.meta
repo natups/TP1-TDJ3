@@ -5,6 +5,12 @@ TextureImporter:
   - first:
       213: -84407192415819261
     second: QuietoEspalda_0
+  - first:
+      213: -4485949057525458696
+    second: QuietoEspalda_1
+  - first:
+      213: -1639930091797158064
+    second: QuietoEspalda_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -134,6 +140,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: QuietoEspalda_1
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 2
+        width: 21
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f852b98915beb1c0800000000000000
+      internalID: -4485949057525458696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: QuietoEspalda_2
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 2
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 057e4fd254ccd39e0800000000000000
+      internalID: -1639930091797158064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -149,6 +199,8 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       QuietoEspalda_0: -84407192415819261
+      QuietoEspalda_1: -4485949057525458696
+      QuietoEspalda_2: -1639930091797158064
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

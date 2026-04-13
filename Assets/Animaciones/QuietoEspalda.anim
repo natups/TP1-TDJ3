@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CaminarEspalda
+  m_Name: QuietoEspalda
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,13 +21,11 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 5778899858142097919, guid: 6a5b9573fe7916d47ac959bdf0392dbc, type: 3}
+      value: {fileID: -84407192415819261, guid: 672beb6c1d7ee9b4b9c23c9729dcd4e4, type: 3}
     - time: 0.083333336
-      value: {fileID: -852083344219729469, guid: 6a5b9573fe7916d47ac959bdf0392dbc, type: 3}
+      value: {fileID: -4485949057525458696, guid: 672beb6c1d7ee9b4b9c23c9729dcd4e4, type: 3}
     - time: 0.16666667
-      value: {fileID: 850046067611559583, guid: 6a5b9573fe7916d47ac959bdf0392dbc, type: 3}
-    - time: 0.25
-      value: {fileID: 7589315033444901259, guid: 6a5b9573fe7916d47ac959bdf0392dbc, type: 3}
+      value: {fileID: -1639930091797158064, guid: 672beb6c1d7ee9b4b9c23c9729dcd4e4, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
@@ -46,7 +44,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.33333334
+    m_StopTime: 0.25
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
