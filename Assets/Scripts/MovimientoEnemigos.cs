@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MovimientoEnemigos : MonoBehaviour
 {
-    public float speed = 2f;
+    public float speed = 0.5f;
 
     public LayerMask obstaculosLayer;
     public LayerMask bloquesLayer;
@@ -11,7 +11,22 @@ public class MovimientoEnemigos : MonoBehaviour
 
     void Start()
     {
+        enemigosVivos++;
         ChooseNewDirection();
+    }
+
+    public static int enemigosVivos = 0;
+
+
+    void OnDestroy()
+    {
+        enemigosVivos--;
+
+        if (enemigosVivos <= 0)
+        {
+            Debug.Log("GANASTE");
+            Time.timeScale = 0f;
+        }
     }
 
     void Update()
@@ -30,14 +45,15 @@ public class MovimientoEnemigos : MonoBehaviour
 
             if (bloque != null)
             {
-                // 💥 SOLO MUERE SI ESTÁ SIENDO EMPUJADO
+                // SOLO MUERE SI ESTÁ SIENDO EMPUJADO
                 if (bloque.isMoving)
                 {
                     Destroy(gameObject);
+                    bloque.Destruir(); // también se rompe el bloque
                     return;
                 }
 
-                // 🧱 si está quieto = pared
+                // si está quieto = pared
                 ChooseNewDirection();
                 return;
             }
@@ -48,6 +64,16 @@ public class MovimientoEnemigos : MonoBehaviour
         }
 
         transform.position += (Vector3)direction * speed * Time.deltaTime;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+    MovimientoJugador player = collision.gameObject.GetComponent<MovimientoJugador>();
+
+    if (player != null)
+    {
+        player.RecibirDanio();
+    }
     }
 
     void ChooseNewDirection()

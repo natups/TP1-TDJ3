@@ -9,12 +9,31 @@ public class MovimientoJugador : MonoBehaviour
     // interacción
     public float interactDistance = 1.5f;
     public LayerMask bloqueLayer;
+    public int vidas = 3;
 
     private Vector2 lastDirection = Vector2.down;
 
     void Start()
     {
         animator = GetComponent<Animator>();
+    }
+    
+    public void RecibirDanio()
+    {
+    vidas--;
+
+    Debug.Log("Vidas restantes: " + vidas);
+
+    if (vidas <= 0)
+    {
+        GameOver();
+    }
+    }
+
+    void GameOver()
+    {
+    Debug.Log("PERDISTE");
+    Time.timeScale = 0f;
     }
 
     void Update()

@@ -51,6 +51,11 @@ public class BloquesMoviles : MonoBehaviour
         isMoving = false;
     }
 
+    public void Destruir()
+    {
+    StartCoroutine(Respawn());
+    }
+
     private IEnumerator Respawn()
     {
         GetComponent<SpriteRenderer>().enabled = false;
