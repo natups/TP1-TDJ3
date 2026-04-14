@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class EnemyMovimiento : MonoBehaviour
+public class MovimientoEnemigos : MonoBehaviour
 {
     public float speed = 2f;
+
     public LayerMask obstaculosLayer;
     public LayerMask bloquesLayer;
-    public float checkDistance = 0.2f;
 
     private Vector2 direction;
 
@@ -18,17 +18,36 @@ public class EnemyMovimiento : MonoBehaviour
     {
         Vector2 origin = transform.position;
 
-        // chequeo antes de moverse
-        RaycastHit2D hit = Physics2D.Raycast(origin, direction, checkDistance, obstaculosLayer);
+        int mask = obstaculosLayer | bloquesLayer;
 
-        if (hit.collider == null)
+        RaycastHit2D hit = Physics2D.Raycast(origin, direction, 0.5f, mask);
+
+        Debug.DrawRay(origin, direction * 0.5f, Color.red);
+
+        if (hit.collider != null)
         {
-            transform.position += (Vector3)direction * speed * Time.deltaTime;
-        }
-        else
-        {
+            BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
+
+            if (bloque != null)
+            {
+                // 💥 SOLO MUERE SI ESTÁ SIENDO EMPUJADO
+                if (bloque.isMoving)
+                {
+                    Destroy(gameObject);
+                    return;
+                }
+
+                // 🧱 si está quieto = pared
+                ChooseNewDirection();
+                return;
+            }
+
+            // obstáculo normal
             ChooseNewDirection();
+            return;
         }
+
+        transform.position += (Vector3)direction * speed * Time.deltaTime;
     }
 
     void ChooseNewDirection()

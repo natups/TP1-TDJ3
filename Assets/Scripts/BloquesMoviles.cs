@@ -9,7 +9,8 @@ public class BloquesMoviles : MonoBehaviour
     public float respawnTime = 3f;
 
     private Vector3 initialPosition;
-    private bool isMoving = false;
+
+    public bool isMoving = false;
 
     void Start()
     {
@@ -46,19 +47,19 @@ public class BloquesMoviles : MonoBehaviour
         }
 
         transform.position = end;
+
         isMoving = false;
     }
 
     private IEnumerator Respawn()
     {
-        // desactivar visual y collider
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
 
         yield return new WaitForSeconds(respawnTime);
 
-        // volver a aparecer
         transform.position = initialPosition;
+
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Collider2D>().enabled = true;
     }
