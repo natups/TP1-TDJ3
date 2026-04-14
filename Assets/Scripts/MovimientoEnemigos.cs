@@ -4,6 +4,7 @@ public class EnemyMovimiento : MonoBehaviour
 {
     public float speed = 2f;
     public LayerMask obstaculosLayer;
+    public LayerMask bloquesLayer;
     public float checkDistance = 0.2f;
 
     private Vector2 direction;
