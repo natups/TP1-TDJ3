@@ -22,7 +22,6 @@ public class BloquesMoviles : MonoBehaviour
     {
         if (isMoving) return;
 
-        // 🔥 pequeño empujón visual
         StartCoroutine(PequenoEmpujon(direccion));
 
         BloquesMoviles ultimo = BuscarUltimoBloque(direccion);
@@ -60,7 +59,7 @@ public class BloquesMoviles : MonoBehaviour
         transform.position = start;
     }
 
-    // BUSCA EL ÚLTIMO BLOQUE QUE SE PUEDE MOVER
+    // BUSCA EL ÚLTIMO BLOQUE
     BloquesMoviles BuscarUltimoBloque(Vector2 direccion)
     {
         Transform actual = transform;
@@ -80,13 +79,8 @@ public class BloquesMoviles : MonoBehaviour
                 obstaculosLayer
             );
 
-            Debug.DrawLine(actual.position, checkPos, Color.yellow, 1f);
-
             if (hit == null)
-            {
-                // espacio libre
                 return ultimo;
-            }
 
             BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
 
@@ -100,7 +94,6 @@ public class BloquesMoviles : MonoBehaviour
             }
             else
             {
-                // pared
                 return null;
             }
         }
@@ -108,7 +101,7 @@ public class BloquesMoviles : MonoBehaviour
         return null;
     }
 
-    // DESLIZAMIENTO CONTINUO
+    // DESLIZAMIENTO
     public IEnumerator Deslizar(Vector2 direccion)
     {
         isMoving = true;
@@ -123,7 +116,6 @@ public class BloquesMoviles : MonoBehaviour
                 obstaculosLayer
             );
 
-            // 💥 si hay algo adelante
             if (hit != null)
             {
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
@@ -131,18 +123,15 @@ public class BloquesMoviles : MonoBehaviour
                 if (enemigo != null)
                 {
                     Destroy(enemigo.gameObject);
-
-                    // 🔥 IMPORTANTE: seguimos avanzando
                 }
                 else
                 {
-                    // 🧱 pared o bloque → se rompe
+                    // 💥 ahora usa expansión correcta
                     Destruir();
                     break;
                 }
             }
 
-            // 🚀 movimiento en pasos de grid (CLAVE)
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion;
 
@@ -161,14 +150,88 @@ public class BloquesMoviles : MonoBehaviour
         isMoving = false;
     }
 
+    // 🔥 TECLA K → SOLO DESTRUIR (SIN ONDA)
     public void Romper()
     {
         StartCoroutine(Respawn());
     }
 
+    // 💥 DESTRUCCIÓN CON EXPANSIÓN REAL
     public void Destruir()
     {
+        GenerarExpansion();
         StartCoroutine(Respawn());
+    }
+
+    // 💥 EXPANSIÓN DE 1 TILE INTELIGENTE
+    void GenerarExpansion()
+    {
+        EvaluarDireccion(Vector2.up);
+        EvaluarDireccion(Vector2.down);
+        EvaluarDireccion(Vector2.left);
+        EvaluarDireccion(Vector2.right);
+    }
+
+    void EvaluarDireccion(Vector2 direccion)
+    {
+        Vector2 checkPos = (Vector2)transform.position + direccion;
+
+        Collider2D hit = Physics2D.OverlapCircle(
+            checkPos,
+            0.2f,
+            obstaculosLayer
+        );
+
+        // DEBUG visual
+        Debug.DrawLine(transform.position, checkPos, Color.magenta, 0.5f);
+
+        if (hit != null)
+        {
+            // 👾 enemigo
+            MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
+            if (enemigo != null)
+            {
+                Destroy(enemigo.gameObject);
+                return;
+            }
+
+            // 🧊 bloque móvil
+            BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
+            if (bloque != null)
+            {
+                bloque.StartCoroutine(bloque.MoverUnaCelda(direccion));
+                return;
+            }
+
+            // 🧱 bloque fijo → no hace nada
+            return;
+        }
+
+        // ✔ espacio libre → (solo visual por ahora)
+    }
+
+    // EMPUJE SIMPLE (SIN CADENA)
+    public IEnumerator MoverUnaCelda(Vector2 direccion)
+    {
+        if (isMoving) yield break;
+
+        isMoving = true;
+
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)direccion;
+
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * slideSpeed;
+            transform.position = Vector3.Lerp(start, end, t);
+            yield return null;
+        }
+
+        transform.position = end;
+
+        isMoving = false;
     }
 
     private IEnumerator Respawn()
