@@ -7,7 +7,7 @@ public class BloquesMoviles : MonoBehaviour
     public float moveSpeed = 5f;
 
     public float respawnTime = 3f;
-
+    public LayerMask obstaculosLayer;
     private Vector3 initialPosition;
 
     public bool isMoving = false;
@@ -20,6 +20,20 @@ public class BloquesMoviles : MonoBehaviour
     public void Empujar(Vector2 direccion)
     {
         if (isMoving) return;
+
+        // 💥 chequeo de colisión antes de moverse
+        RaycastHit2D hit = Physics2D.Raycast(
+            transform.position,
+            direccion,
+            moveDistance,
+            obstaculosLayer
+        );
+
+        if (hit.collider != null)
+        {
+            // hay algo adelante → no se mueve
+            return;
+        }
 
         StartCoroutine(Mover(direccion));
     }
