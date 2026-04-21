@@ -6,8 +6,6 @@ public class BloquesMoviles : MonoBehaviour
     public float slideSpeed = 12f;
     public float respawnTime = 3f;
 
-    public LayerMask obstaculosLayer;
-
     private Vector3 initialPosition;
 
     public bool isMoving = false;
@@ -73,10 +71,10 @@ public class BloquesMoviles : MonoBehaviour
 
             Vector2 checkPos = (Vector2)actual.position + direccion;
 
-            Collider2D hit = Physics2D.OverlapCircle(
+            Collider2D hit = Physics2D.OverlapBox(
                 checkPos,
-                0.2f,
-                obstaculosLayer
+                new Vector2(0.8f, 0.8f),
+                0f
             );
 
             if (hit == null)
@@ -110,10 +108,10 @@ public class BloquesMoviles : MonoBehaviour
         {
             Vector2 nextPos = (Vector2)transform.position + direccion;
 
-            Collider2D hit = Physics2D.OverlapCircle(
+            Collider2D hit = Physics2D.OverlapBox(
                 nextPos,
-                0.2f,
-                obstaculosLayer
+                new Vector2(0.8f, 0.8f),
+                0f
             );
 
             if (hit != null)
@@ -126,7 +124,6 @@ public class BloquesMoviles : MonoBehaviour
                 }
                 else
                 {
-                    // 💥 ahora usa expansión correcta
                     Destruir();
                     break;
                 }
@@ -145,25 +142,29 @@ public class BloquesMoviles : MonoBehaviour
             }
 
             transform.position = end;
+
+            // SNAP A GRID
+            transform.position = new Vector3(
+                Mathf.Round(transform.position.x),
+                Mathf.Round(transform.position.y),
+                transform.position.z
+            );
         }
 
         isMoving = false;
     }
 
-    // 🔥 TECLA K → SOLO DESTRUIR (SIN ONDA)
     public void Romper()
     {
         StartCoroutine(Respawn());
     }
 
-    // 💥 DESTRUCCIÓN CON EXPANSIÓN REAL
     public void Destruir()
     {
         GenerarExpansion();
         StartCoroutine(Respawn());
     }
 
-    // 💥 EXPANSIÓN DE 1 TILE INTELIGENTE
     void GenerarExpansion()
     {
         EvaluarDireccion(Vector2.up);
@@ -176,18 +177,14 @@ public class BloquesMoviles : MonoBehaviour
     {
         Vector2 checkPos = (Vector2)transform.position + direccion;
 
-        Collider2D hit = Physics2D.OverlapCircle(
+        Collider2D hit = Physics2D.OverlapBox(
             checkPos,
-            0.2f,
-            obstaculosLayer
+            new Vector2(0.8f, 0.8f),
+            0f
         );
-
-        // DEBUG visual
-        Debug.DrawLine(transform.position, checkPos, Color.magenta, 0.5f);
 
         if (hit != null)
         {
-            // 👾 enemigo
             MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
             if (enemigo != null)
             {
@@ -195,7 +192,6 @@ public class BloquesMoviles : MonoBehaviour
                 return;
             }
 
-            // 🧊 bloque móvil
             BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
             if (bloque != null)
             {
@@ -203,14 +199,10 @@ public class BloquesMoviles : MonoBehaviour
                 return;
             }
 
-            // 🧱 bloque fijo → no hace nada
             return;
         }
-
-        // ✔ espacio libre → (solo visual por ahora)
     }
 
-    // EMPUJE SIMPLE (SIN CADENA)
     public IEnumerator MoverUnaCelda(Vector2 direccion)
     {
         if (isMoving) yield break;
@@ -230,6 +222,12 @@ public class BloquesMoviles : MonoBehaviour
         }
 
         transform.position = end;
+
+        transform.position = new Vector3(
+            Mathf.Round(transform.position.x),
+            Mathf.Round(transform.position.y),
+            transform.position.z
+        );
 
         isMoving = false;
     }
