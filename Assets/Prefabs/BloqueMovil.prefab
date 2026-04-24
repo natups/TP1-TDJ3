@@ -128,7 +128,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.00000011920929}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -137,8 +137,8 @@ BoxCollider2D:
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_AutoTiling: 1
+  m_Size: {x: 0.7677934, y: 0.88836217}
   m_EdgeRadius: 0
 --- !u!50 &6356786300240931581
 Rigidbody2D:
@@ -179,9 +179,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71205a59cd8688d469bde5ab0e274e65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BloquesMoviles
+  bloquesLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  paredesLayer:
+    serializedVersion: 2
+    m_Bits: 512
   slideSpeed: 12
   respawnTime: 3
-  obstaculosLayer:
-    serializedVersion: 2
-    m_Bits: 192
   isMoving: 0

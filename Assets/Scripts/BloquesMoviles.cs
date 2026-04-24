@@ -3,6 +3,9 @@ using System.Collections;
 
 public class BloquesMoviles : MonoBehaviour
 {
+    public LayerMask bloquesLayer;
+    public LayerMask paredesLayer;
+
     public float slideSpeed = 12f;
     public float respawnTime = 3f;
 
@@ -15,21 +18,47 @@ public class BloquesMoviles : MonoBehaviour
         initialPosition = transform.position;
     }
 
+    // =========================
+    // 🔷 HELPERS GRID (CLAVE)
+    // =========================
+
+    Vector2 GetGridPos(Vector3 pos)
+    {
+        return new Vector2(
+            Mathf.Round(pos.x),
+            Mathf.Round(pos.y)
+        );
+    }
+
+    Vector3 ToWorld(Vector2 gridPos, float z)
+    {
+        return new Vector3(gridPos.x, gridPos.y, z);
+    }
+
+    // =========================
     // EMPUJAR 
+    // =========================
     public void Empujar(Vector2 direccion)
     {
         if (isMoving) return;
 
+        direccion = direccion.normalized;
+
         StartCoroutine(PequenoEmpujon(direccion));
 
         BloquesMoviles ultimo = BuscarUltimoBloque(direccion);
+        if (ultimo == null) return;
 
-        if (ultimo != null)
-        {
-            ultimo.StartCoroutine(ultimo.Deslizar(direccion));
-        }
+        Vector2 nextPos = GetGridPos(ultimo.transform.position) + direccion;
+
+        // 🚫 si hay bloque adelante → no se mueve
+        if (Physics2D.OverlapPoint(nextPos, bloquesLayer))
+            return;
+
+        ultimo.StartCoroutine(ultimo.Deslizar(direccion));
     }
 
+    // =========================
     IEnumerator PequenoEmpujon(Vector2 direccion)
     {
         Vector3 start = transform.position;
@@ -57,7 +86,9 @@ public class BloquesMoviles : MonoBehaviour
         transform.position = start;
     }
 
-    // BUSCA EL ÚLTIMO BLOQUE
+    // =========================
+    // BUSCAR ÚLTIMO BLOQUE
+    // =========================
     BloquesMoviles BuscarUltimoBloque(Vector2 direccion)
     {
         Transform actual = transform;
@@ -69,13 +100,9 @@ public class BloquesMoviles : MonoBehaviour
         {
             seguridad--;
 
-            Vector2 checkPos = (Vector2)actual.position + direccion;
+            Vector2 checkPos = GetGridPos(actual.position) + direccion;
 
-            Collider2D hit = Physics2D.OverlapBox(
-                checkPos,
-                new Vector2(0.8f, 0.8f),
-                0f
-            );
+            Collider2D hit = Physics2D.OverlapPoint(checkPos, bloquesLayer);
 
             if (hit == null)
                 return ultimo;
@@ -92,27 +119,27 @@ public class BloquesMoviles : MonoBehaviour
             }
             else
             {
-                return null;
+                return ultimo;
             }
         }
 
-        return null;
+        return ultimo;
     }
 
-    // DESLIZAMIENTO
+    // =========================
+    // DESLIZAR
+    // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
         isMoving = true;
+
+        Vector2 boxSize = new Vector2(0.6f, 0.6f); // 🔥 clave: más chico que el tile
 
         while (true)
         {
             Vector2 nextPos = (Vector2)transform.position + direccion;
 
-            Collider2D hit = Physics2D.OverlapBox(
-                nextPos,
-                new Vector2(0.8f, 0.8f),
-                0f
-            );
+            Collider2D hit = Physics2D.OverlapBox(nextPos, boxSize, 0f);
 
             if (hit != null)
             {
@@ -124,11 +151,13 @@ public class BloquesMoviles : MonoBehaviour
                 }
                 else
                 {
+                    // 👉 SOLO rompe si realmente tocó algo sólido
                     Destruir();
                     break;
                 }
             }
 
+            // 👉 movimiento normal
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion;
 
@@ -142,18 +171,12 @@ public class BloquesMoviles : MonoBehaviour
             }
 
             transform.position = end;
-
-            // SNAP A GRID
-            transform.position = new Vector3(
-                Mathf.Round(transform.position.x),
-                Mathf.Round(transform.position.y),
-                transform.position.z
-            );
         }
 
         isMoving = false;
     }
 
+    // =========================
     public void Romper()
     {
         StartCoroutine(Respawn());
@@ -165,6 +188,7 @@ public class BloquesMoviles : MonoBehaviour
         StartCoroutine(Respawn());
     }
 
+    // =========================
     void GenerarExpansion()
     {
         EvaluarDireccion(Vector2.up);
@@ -175,31 +199,20 @@ public class BloquesMoviles : MonoBehaviour
 
     void EvaluarDireccion(Vector2 direccion)
     {
-        Vector2 checkPos = (Vector2)transform.position + direccion;
+        Vector2 checkPos = GetGridPos(transform.position) + direccion;
 
-        Collider2D hit = Physics2D.OverlapBox(
-            checkPos,
-            new Vector2(0.8f, 0.8f),
-            0f
-        );
+        Collider2D bloque = Physics2D.OverlapPoint(checkPos, bloquesLayer);
+        Collider2D wall = Physics2D.OverlapPoint(checkPos, paredesLayer);
 
-        if (hit != null)
+        if (wall != null) return;
+
+        if (bloque != null)
         {
-            MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
-            if (enemigo != null)
+            BloquesMoviles b = bloque.GetComponent<BloquesMoviles>();
+            if (b != null)
             {
-                Destroy(enemigo.gameObject);
-                return;
+                b.StartCoroutine(b.MoverUnaCelda(direccion));
             }
-
-            BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
-            if (bloque != null)
-            {
-                bloque.StartCoroutine(bloque.MoverUnaCelda(direccion));
-                return;
-            }
-
-            return;
         }
     }
 
@@ -209,8 +222,11 @@ public class BloquesMoviles : MonoBehaviour
 
         isMoving = true;
 
+        Vector2 currentGrid = GetGridPos(transform.position);
+        Vector2 nextPos = currentGrid + direccion;
+
         Vector3 start = transform.position;
-        Vector3 end = start + (Vector3)direccion;
+        Vector3 end = ToWorld(nextPos, transform.position.z);
 
         float t = 0f;
 
@@ -222,12 +238,6 @@ public class BloquesMoviles : MonoBehaviour
         }
 
         transform.position = end;
-
-        transform.position = new Vector3(
-            Mathf.Round(transform.position.x),
-            Mathf.Round(transform.position.y),
-            transform.position.z
-        );
 
         isMoving = false;
     }
