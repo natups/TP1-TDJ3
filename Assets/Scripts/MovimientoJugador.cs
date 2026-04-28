@@ -124,7 +124,7 @@ public class MovimientoJugador : MonoBehaviour
 
             if (bloque != null)
             {
-                bloque.Romper();
+                bloque.Destruir();
             }
         }
     }
