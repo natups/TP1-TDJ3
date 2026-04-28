@@ -39,24 +39,51 @@ public class BloquesMoviles : MonoBehaviour
     // EMPUJAR 
     // =========================
     public void Empujar(Vector2 direccion)
+{
+    if (isMoving) return;
+
+    direccion = direccion.normalized;
+
+    BloquesMoviles ultimo = BuscarUltimoBloque(direccion);
+    if (ultimo == null) return;
+
+    Vector2 nextPos = GetGridPos(ultimo.transform.position) + direccion;
+
+    // 🔍 DEBUG VISUAL (línea en escena)
+    Debug.DrawLine(ultimo.transform.position, nextPos, Color.red, 1f);
+
+    // 🔍 DEBUG BLOQUES
+    Collider2D hitBloque = Physics2D.OverlapPoint(nextPos, bloquesLayer);
+    if (hitBloque != null)
     {
-        if (isMoving) return;
-
-        direccion = direccion.normalized;
-
-        StartCoroutine(PequenoEmpujon(direccion));
-
-        BloquesMoviles ultimo = BuscarUltimoBloque(direccion);
-        if (ultimo == null) return;
-
-        Vector2 nextPos = GetGridPos(ultimo.transform.position) + direccion;
-
-        // 🚫 si hay bloque adelante → no se mueve
-        if (Physics2D.OverlapPoint(nextPos, bloquesLayer))
-            return;
-
-        ultimo.StartCoroutine(ultimo.Deslizar(direccion));
+        Debug.Log("Detectó BLOQUE: " + hitBloque.name);
     }
+
+    // 🔍 DEBUG PAREDES
+    Collider2D hitPared = Physics2D.OverlapPoint(nextPos, paredesLayer);
+    if (hitPared != null)
+    {
+        Debug.Log("Detectó PARED: " + hitPared.name);
+    }
+
+    // 🚫 BLOQUE ADELANTE → rebote
+    if (hitBloque != null)
+    {
+        StartCoroutine(PequenoEmpujon(direccion));
+        return;
+    }
+
+    // 🚫 PARED ADELANTE → rebote
+    if (hitPared != null)
+    {
+        StartCoroutine(PequenoEmpujon(direccion));
+        return;
+    }
+
+    // ✅ SI ESTA LIBRE → empuja normal
+    StartCoroutine(PequenoEmpujon(direccion));
+    ultimo.StartCoroutine(ultimo.Deslizar(direccion));
+}
 
     // =========================
     IEnumerator PequenoEmpujon(Vector2 direccion)
@@ -127,13 +154,13 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
-    // DESLIZAR
+    // DESLIZAR (🔥 SOLO CAMBIO ACÁ)
     // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
         isMoving = true;
 
-        Vector2 boxSize = new Vector2(0.6f, 0.6f); // 🔥 clave: más chico que el tile
+        Vector2 boxSize = new Vector2(0.6f, 0.6f);
 
         while (true)
         {
@@ -145,16 +172,17 @@ public class BloquesMoviles : MonoBehaviour
             {
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
 
+                // 🔴 SI ES ENEMIGO
                 if (enemigo != null)
                 {
                     Destroy(enemigo.gameObject);
-                }
-                else
-                {
-                    // 👉 SOLO rompe si realmente tocó algo sólido
-                    Destruir();
+                    Destruir(); // 🔥 ahora también se destruye el bloque
                     break;
                 }
+
+                // 🔴 SI ES CUALQUIER OTRA COSA (pared / obstáculo)
+                Destruir();
+                break;
             }
 
             // 👉 movimiento normal

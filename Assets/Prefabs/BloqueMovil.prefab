@@ -181,7 +181,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BloquesMoviles
   bloquesLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   paredesLayer:
     serializedVersion: 2
     m_Bits: 512
