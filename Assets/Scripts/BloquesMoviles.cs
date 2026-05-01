@@ -20,13 +20,25 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
+    // 🔥 NUEVO: DIRECCIÓN CARDINAL
+    // =========================
+    Vector2 DireccionCardinal(Vector2 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+            return new Vector2(Mathf.Sign(dir.x), 0);
+        else
+            return new Vector2(0, Mathf.Sign(dir.y));
+    }
+
+    // =========================
     // EMPUJAR
     // =========================
     public void Empujar(Vector2 direccion)
     {
         if (isMoving) return;
 
-        direccion = direccion.normalized;
+        // 🔥 CAMBIO CLAVE (antes normalized)
+        direccion = DireccionCardinal(direccion);
 
         List<BloquesMoviles> cadena = ObtenerCadena(direccion);
 
@@ -133,7 +145,7 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
-    // DESLIZAR (FIX REAL)
+    // DESLIZAR
     // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
@@ -157,7 +169,6 @@ public class BloquesMoviles : MonoBehaviour
             RaycastHit2D hitValido = new RaycastHit2D();
             bool encontro = false;
 
-            // 🔥 ignorar su propio collider
             foreach (var hit in hits)
             {
                 if (hit.collider != propioCollider)
@@ -172,7 +183,6 @@ public class BloquesMoviles : MonoBehaviour
             {
                 GameObject obj = hitValido.collider.gameObject;
 
-                // 🔴 PARED
                 if (((1 << obj.layer) & paredesLayer) != 0)
                 {
                     if (rebotes < 1)
@@ -191,7 +201,6 @@ public class BloquesMoviles : MonoBehaviour
                     break;
                 }
 
-                // 🪑 ROMPIBLE
                 if (((1 << obj.layer) & bloqueRompibleLayer) != 0)
                 {
                     Destroy(obj);
@@ -199,7 +208,6 @@ public class BloquesMoviles : MonoBehaviour
                     break;
                 }
 
-                // 🔵 BLOQUE MOVIL
                 if (((1 << obj.layer) & bloquesLayer) != 0)
                 {
                     BloquesMoviles otro = obj.GetComponent<BloquesMoviles>();
@@ -212,7 +220,6 @@ public class BloquesMoviles : MonoBehaviour
                     break;
                 }
 
-                // 👾 ENEMIGO
                 MovimientoEnemigos enemigo = obj.GetComponent<MovimientoEnemigos>();
 
                 if (enemigo != null)
@@ -223,7 +230,6 @@ public class BloquesMoviles : MonoBehaviour
                 }
             }
 
-            // 🟢 MOVER
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion;
 
