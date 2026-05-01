@@ -12,7 +12,6 @@ public class BloquesMoviles : MonoBehaviour
     public float respawnTime = 8f;
 
     private Vector3 initialPosition;
-
     public bool isMoving = false;
 
     void Start()
@@ -37,30 +36,24 @@ public class BloquesMoviles : MonoBehaviour
 
         Vector2 nextPos = (Vector2)ultimo.transform.position + direccion;
 
-        // 🔍 DETECCIÓN REAL (sin grid falso)
         Collider2D hitBloque = Physics2D.OverlapBox(nextPos, new Vector2(0.6f, 0.6f), 0f, bloquesLayer);
         Collider2D hitPared = Physics2D.OverlapBox(nextPos, new Vector2(0.6f, 0.6f), 0f, paredesLayer);
 
-        // 🚫 BLOQUE O PARED → SOLO REBOTE
         if (hitBloque != null || hitPared != null)
         {
             StartCoroutine(ReboteEnCadena(cadena, direccion));
             return;
         }
 
-        // ✅ LIBRE → REBOTE + ÚLTIMO SE DESLIZA
         StartCoroutine(EmpujarConFeedback(cadena, direccion));
     }
 
-    // =========================
-    // OBTENER CADENA
     // =========================
     List<BloquesMoviles> ObtenerCadena(Vector2 direccion)
     {
         List<BloquesMoviles> lista = new List<BloquesMoviles>();
 
         Transform actual = transform;
-
         int seguridad = 20;
 
         while (seguridad > 0)
@@ -70,7 +63,6 @@ public class BloquesMoviles : MonoBehaviour
             BloquesMoviles bloque = actual.GetComponent<BloquesMoviles>();
 
             if (bloque == null) break;
-
             if (bloque.isMoving) return null;
 
             lista.Add(bloque);
@@ -89,27 +81,19 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
-    // EMPUJE CON GAME FEEL
-    // =========================
     IEnumerator EmpujarConFeedback(List<BloquesMoviles> cadena, Vector2 direccion)
     {
-        // 🔹 todos hacen rebote
         foreach (var bloque in cadena)
         {
             bloque.StartCoroutine(bloque.PequenoEmpujon(direccion));
         }
 
-        // 🔹 pequeño delay para que se vea natural
         yield return new WaitForSeconds(0.05f);
 
-        // 🔹 SOLO el último se desliza
         BloquesMoviles ultimo = cadena[cadena.Count - 1];
         ultimo.StartCoroutine(ultimo.Deslizar(direccion));
     }
 
-    // =========================
-    // REBOTE EN CADENA (cuando está bloqueado)
-    // =========================
     IEnumerator ReboteEnCadena(List<BloquesMoviles> cadena, Vector2 direccion)
     {
         foreach (var bloque in cadena)
@@ -120,8 +104,6 @@ public class BloquesMoviles : MonoBehaviour
         yield return null;
     }
 
-    // =========================
-    // PEQUEÑO EMPUJÓN (feedback)
     // =========================
     IEnumerator PequenoEmpujon(Vector2 direccion)
     {
@@ -151,45 +133,87 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
-    // DESLIZAR 
+    // DESLIZAR (FIX REAL)
     // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
         isMoving = true;
 
         Vector2 boxSize = new Vector2(0.6f, 0.6f);
+        int rebotes = 0;
+
+        Collider2D propioCollider = GetComponent<Collider2D>();
 
         while (true)
         {
-            Vector2 nextPos = (Vector2)transform.position + direccion;
+            RaycastHit2D[] hits = Physics2D.BoxCastAll(
+                transform.position,
+                boxSize,
+                0f,
+                direccion,
+                1f
+            );
 
-            // 1. PARED → destruir bloque
-            if (Physics2D.OverlapBox(nextPos, boxSize, 0f, paredesLayer))
+            RaycastHit2D hitValido = new RaycastHit2D();
+            bool encontro = false;
+
+            // 🔥 ignorar su propio collider
+            foreach (var hit in hits)
             {
-                Destruir();
-                break;
+                if (hit.collider != propioCollider)
+                {
+                    hitValido = hit;
+                    encontro = true;
+                    break;
+                }
             }
 
-            // 2. BLOQUE ROMPIBLE → destruir ambos
-            Collider2D rompible = Physics2D.OverlapBox(nextPos, boxSize, 0f, bloqueRompibleLayer);
-            if (rompible != null)
+            if (encontro)
             {
-                Destroy(rompible.gameObject); // rompe silla 2
-                Destruir(); // se destruye silla 1
-                break;
-            }
+                GameObject obj = hitValido.collider.gameObject;
 
-            // 3. BLOQUE MOVIL → frena (NO atraviesa)
-            if (Physics2D.OverlapBox(nextPos, boxSize, 0f, bloquesLayer))
-            {
-                break;
-            }
+                // 🔴 PARED
+                if (((1 << obj.layer) & paredesLayer) != 0)
+                {
+                    if (rebotes < 1)
+                    {
+                        Vector2 reboteDir = ObtenerRebote(direccion);
 
-            // 4. ENEMIGO → muere + bloque se destruye
-            Collider2D hit = Physics2D.OverlapBox(nextPos, boxSize, 0f);
-            if (hit != null)
-            {
-                MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
+                        if (reboteDir != Vector2.zero)
+                        {
+                            direccion = reboteDir;
+                            rebotes++;
+                            continue;
+                        }
+                    }
+
+                    Destruir();
+                    break;
+                }
+
+                // 🪑 ROMPIBLE
+                if (((1 << obj.layer) & bloqueRompibleLayer) != 0)
+                {
+                    Destroy(obj);
+                    Destruir();
+                    break;
+                }
+
+                // 🔵 BLOQUE MOVIL
+                if (((1 << obj.layer) & bloquesLayer) != 0)
+                {
+                    BloquesMoviles otro = obj.GetComponent<BloquesMoviles>();
+
+                    if (otro != null && !otro.isMoving)
+                    {
+                        otro.StartCoroutine(otro.Deslizar(direccion));
+                    }
+
+                    break;
+                }
+
+                // 👾 ENEMIGO
+                MovimientoEnemigos enemigo = obj.GetComponent<MovimientoEnemigos>();
 
                 if (enemigo != null)
                 {
@@ -199,7 +223,7 @@ public class BloquesMoviles : MonoBehaviour
                 }
             }
 
-            // 5. MOVER NORMAL
+            // 🟢 MOVER
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion;
 
@@ -219,12 +243,29 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
+    Vector2 ObtenerRebote(Vector2 direccion)
+    {
+        Vector2 derecha = new Vector2(direccion.y, -direccion.x);
+        Vector2 izquierda = new Vector2(-direccion.y, direccion.x);
+
+        Vector2 pos = transform.position;
+        Vector2 boxSize = new Vector2(0.6f, 0.6f);
+
+        if (!Physics2D.OverlapBox(pos + derecha, boxSize, 0f, paredesLayer))
+            return derecha;
+
+        if (!Physics2D.OverlapBox(pos + izquierda, boxSize, 0f, paredesLayer))
+            return izquierda;
+
+        return Vector2.zero;
+    }
+
+    // =========================
     public void Destruir()
     {
         StartCoroutine(Respawn());
     }
 
-    // =========================
     private IEnumerator Respawn()
     {
         GetComponent<SpriteRenderer>().enabled = false;
