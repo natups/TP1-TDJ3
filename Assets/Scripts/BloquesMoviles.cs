@@ -8,7 +8,7 @@ public class BloquesMoviles : MonoBehaviour
     public LayerMask paredesLayer;
     public LayerMask bloqueRompibleLayer;
 
-    public float slideSpeed = 18f;
+    public float slideSpeed = 8f;
     public float respawnTime = 8f;
 
     private Vector3 initialPosition;
@@ -19,9 +19,6 @@ public class BloquesMoviles : MonoBehaviour
         initialPosition = transform.position;
     }
 
-    // =========================
-    // 🔥 NUEVO: DIRECCIÓN CARDINAL
-    // =========================
     Vector2 DireccionCardinal(Vector2 dir)
     {
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
@@ -30,14 +27,10 @@ public class BloquesMoviles : MonoBehaviour
             return new Vector2(0, Mathf.Sign(dir.y));
     }
 
-    // =========================
-    // EMPUJAR
-    // =========================
     public void Empujar(Vector2 direccion)
     {
         if (isMoving) return;
 
-        // 🔥 CAMBIO CLAVE (antes normalized)
         direccion = DireccionCardinal(direccion);
 
         List<BloquesMoviles> cadena = ObtenerCadena(direccion);
@@ -60,7 +53,6 @@ public class BloquesMoviles : MonoBehaviour
         StartCoroutine(EmpujarConFeedback(cadena, direccion));
     }
 
-    // =========================
     List<BloquesMoviles> ObtenerCadena(Vector2 direccion)
     {
         List<BloquesMoviles> lista = new List<BloquesMoviles>();
@@ -92,7 +84,6 @@ public class BloquesMoviles : MonoBehaviour
         return lista;
     }
 
-    // =========================
     IEnumerator EmpujarConFeedback(List<BloquesMoviles> cadena, Vector2 direccion)
     {
         foreach (var bloque in cadena)
@@ -116,7 +107,6 @@ public class BloquesMoviles : MonoBehaviour
         yield return null;
     }
 
-    // =========================
     IEnumerator PequenoEmpujon(Vector2 direccion)
     {
         Vector3 start = transform.position;
@@ -144,9 +134,6 @@ public class BloquesMoviles : MonoBehaviour
         transform.position = start;
     }
 
-    // =========================
-    // DESLIZAR
-    // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
         isMoving = true;
@@ -183,6 +170,7 @@ public class BloquesMoviles : MonoBehaviour
             {
                 GameObject obj = hitValido.collider.gameObject;
 
+                // 🔴 PARED
                 if (((1 << obj.layer) & paredesLayer) != 0)
                 {
                     if (rebotes < 1)
@@ -201,13 +189,18 @@ public class BloquesMoviles : MonoBehaviour
                     break;
                 }
 
+                // 🪑 BLOQUE ROMPIBLE
                 if (((1 << obj.layer) & bloqueRompibleLayer) != 0)
                 {
                     Destroy(obj);
+
+                    FindObjectOfType<UIManager>().SumarPuntos(50); // ⭐ PUNTOS
+
                     Destruir();
                     break;
                 }
 
+                // 🔵 BLOQUE MOVIL
                 if (((1 << obj.layer) & bloquesLayer) != 0)
                 {
                     BloquesMoviles otro = obj.GetComponent<BloquesMoviles>();
@@ -220,11 +213,15 @@ public class BloquesMoviles : MonoBehaviour
                     break;
                 }
 
+                // 👾 ENEMIGO
                 MovimientoEnemigos enemigo = obj.GetComponent<MovimientoEnemigos>();
 
                 if (enemigo != null)
                 {
                     Destroy(enemigo.gameObject);
+
+                    FindObjectOfType<UIManager>().SumarPuntos(100); // ⭐ PUNTOS
+
                     Destruir();
                     break;
                 }
@@ -248,7 +245,6 @@ public class BloquesMoviles : MonoBehaviour
         isMoving = false;
     }
 
-    // =========================
     Vector2 ObtenerRebote(Vector2 direccion)
     {
         Vector2 derecha = new Vector2(direccion.y, -direccion.x);
@@ -266,7 +262,6 @@ public class BloquesMoviles : MonoBehaviour
         return Vector2.zero;
     }
 
-    // =========================
     public void Destruir()
     {
         StartCoroutine(Respawn());

@@ -159,7 +159,7 @@ MonoBehaviour:
   speed: 2
   obstaculosLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 2688
   bloquesLayer:
     serializedVersion: 2
     m_Bits: 64

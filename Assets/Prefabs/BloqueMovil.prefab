@@ -188,6 +188,6 @@ MonoBehaviour:
   bloqueRompibleLayer:
     serializedVersion: 2
     m_Bits: 2048
-  slideSpeed: 12
+  slideSpeed: 6
   respawnTime: 3
   isMoving: 0
