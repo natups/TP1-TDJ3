@@ -6,6 +6,7 @@ public class BloquesMoviles : MonoBehaviour
 {
     public LayerMask bloquesLayer;
     public LayerMask paredesLayer;
+    public LayerMask bloqueRompibleLayer;
 
     public float slideSpeed = 18f;
     public float respawnTime = 8f;
@@ -150,7 +151,7 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
-    // DESLIZAR (SOLO EL ÚLTIMO)
+    // DESLIZAR 
     // =========================
     public IEnumerator Deslizar(Vector2 direccion)
     {
@@ -162,26 +163,43 @@ public class BloquesMoviles : MonoBehaviour
         {
             Vector2 nextPos = (Vector2)transform.position + direccion;
 
-            Collider2D hit = Physics2D.OverlapBox(nextPos, boxSize, 0f);
+            // 1. PARED → destruir bloque
+            if (Physics2D.OverlapBox(nextPos, boxSize, 0f, paredesLayer))
+            {
+                Destruir();
+                break;
+            }
 
+            // 2. BLOQUE ROMPIBLE → destruir ambos
+            Collider2D rompible = Physics2D.OverlapBox(nextPos, boxSize, 0f, bloqueRompibleLayer);
+            if (rompible != null)
+            {
+                Destroy(rompible.gameObject); // rompe silla 2
+                Destruir(); // se destruye silla 1
+                break;
+            }
+
+            // 3. BLOQUE MOVIL → frena (NO atraviesa)
+            if (Physics2D.OverlapBox(nextPos, boxSize, 0f, bloquesLayer))
+            {
+                break;
+            }
+
+            // 4. ENEMIGO → muere + bloque se destruye
+            Collider2D hit = Physics2D.OverlapBox(nextPos, boxSize, 0f);
             if (hit != null)
             {
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
 
-                // 🔴 ENEMIGO
                 if (enemigo != null)
                 {
                     Destroy(enemigo.gameObject);
                     Destruir();
                     break;
                 }
-
-                // 🔴 PARED / OBSTÁCULO
-                Destruir();
-                break;
             }
 
-            // 🟢 MOVER
+            // 5. MOVER NORMAL
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion;
 
