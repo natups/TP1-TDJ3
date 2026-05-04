@@ -33,7 +33,7 @@ public class BloqueDiamante : MonoBehaviour
             Destroy(bloqueQueGolpea);
         }
 
-        // 🔨 el diamante recibe daño
+        // 🔨 daño al diamante
         golpesActuales++;
 
         StartCoroutine(Golpecito());
@@ -48,6 +48,9 @@ public class BloqueDiamante : MonoBehaviour
     {
         if (ui != null)
             ui.SumarPuntos(200);
+
+        // ❄ STUN GLOBAL
+        MovimientoEnemigos.StunAll(6f);
 
         Destroy(gameObject);
     }

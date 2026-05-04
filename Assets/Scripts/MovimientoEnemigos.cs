@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class MovimientoEnemigos : MonoBehaviour
 {
@@ -9,18 +10,27 @@ public class MovimientoEnemigos : MonoBehaviour
 
     private Vector2 direction;
 
-    void Start()
-    {
-        enemigosVivos++;
-        ChooseNewDirection();
-    }
+    // 🔵 LISTA GLOBAL DE ENEMIGOS
+    private static List<MovimientoEnemigos> todos = new List<MovimientoEnemigos>();
+
+    // 🧊 STUN
+    private bool estaAturdido = false;
+    private float stunTimer = 0f;
 
     public static int enemigosVivos = 0;
 
+    void Start()
+    {
+        enemigosVivos++;
+        todos.Add(this);
+
+        ChooseNewDirection();
+    }
 
     void OnDestroy()
     {
         enemigosVivos--;
+        todos.Remove(this);
 
         if (enemigosVivos <= 0)
         {
@@ -31,6 +41,17 @@ public class MovimientoEnemigos : MonoBehaviour
 
     void Update()
     {
+        // 🧊 STUN LOGIC
+        if (estaAturdido)
+        {
+            stunTimer -= Time.deltaTime;
+
+            if (stunTimer <= 0)
+                estaAturdido = false;
+
+            return; // no se mueve
+        }
+
         Vector2 origin = transform.position;
 
         int mask = obstaculosLayer | bloquesLayer;
@@ -45,20 +66,17 @@ public class MovimientoEnemigos : MonoBehaviour
 
             if (bloque != null)
             {
-                // SOLO MUERE SI ESTÁ SIENDO EMPUJADO
                 if (bloque.isMoving)
                 {
                     Destroy(gameObject);
-                    bloque.Destruir(); // también se rompe el bloque
+                    bloque.Destruir();
                     return;
                 }
 
-                // si está quieto = pared
                 ChooseNewDirection();
                 return;
             }
 
-            // obstáculo normal
             ChooseNewDirection();
             return;
         }
@@ -68,12 +86,12 @@ public class MovimientoEnemigos : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-    MovimientoJugador player = collision.gameObject.GetComponent<MovimientoJugador>();
+        MovimientoJugador player = collision.gameObject.GetComponent<MovimientoJugador>();
 
-    if (player != null)
-    {
-        player.RecibirDanio();
-    }
+        if (player != null)
+        {
+            player.RecibirDanio();
+        }
     }
 
     void ChooseNewDirection()
@@ -86,6 +104,23 @@ public class MovimientoEnemigos : MonoBehaviour
             case 1: direction = Vector2.down; break;
             case 2: direction = Vector2.left; break;
             case 3: direction = Vector2.right; break;
+        }
+    }
+
+    // 🧊 STUN INDIVIDUAL
+    public void Stun(float duration)
+    {
+        estaAturdido = true;
+        stunTimer = duration;
+    }
+
+    // ❄ STUN GLOBAL (llamado por el diamante)
+    public static void StunAll(float duration)
+    {
+        foreach (var e in todos)
+        {
+            if (e != null)
+                e.Stun(duration);
         }
     }
 }
