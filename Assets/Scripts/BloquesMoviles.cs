@@ -20,7 +20,6 @@ public class BloquesMoviles : MonoBehaviour
     void Start()
     {
         ui = FindAnyObjectByType<UIManager>();
-
         initialPosition = transform.position;
     }
 
@@ -40,7 +39,45 @@ public class BloquesMoviles : MonoBehaviour
 
         direccion = DireccionCardinal(direccion);
 
+        Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
+
+        // 🔴 SI HAY PARED → HACER MINI REBOTE (NO DESLIZA)
+        if (HayAlgo(nextPos, paredesLayer))
+        {
+            StartCoroutine(PequenoEmpujon(direccion));
+            return;
+        }
+
+        // 🟢 SI NO → DESLIZA NORMAL
         StartCoroutine(Deslizar(direccion));
+    }
+
+    // =========================
+    IEnumerator PequenoEmpujon(Vector2 direccion)
+    {
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)direccion * (tileSize * 0.2f);
+
+        float t = 0f;
+        float duracion = 0.05f;
+
+        while (t < duracion)
+        {
+            t += Time.deltaTime;
+            transform.position = Vector3.Lerp(start, end, t / duracion);
+            yield return null;
+        }
+
+        t = 0f;
+
+        while (t < duracion)
+        {
+            t += Time.deltaTime;
+            transform.position = Vector3.Lerp(end, start, t / duracion);
+            yield return null;
+        }
+
+        transform.position = start;
     }
 
     // =========================
@@ -54,7 +91,7 @@ public class BloquesMoviles : MonoBehaviour
         {
             Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-            // 🔴 PARED
+            // 🔴 PARED (REBOTE REAL)
             if (HayAlgo(nextPos, paredesLayer))
             {
                 if (rebotes < 1)
@@ -86,9 +123,17 @@ public class BloquesMoviles : MonoBehaviour
                 break;
             }
 
-            // 🔵 BLOQUE
-            if (HayAlgo(nextPos, bloquesLayer))
+            // 🔵 BLOQUE (EMPUJA SOLO AL ÚLTIMO)
+            Collider2D bloque = GetCollider(nextPos, bloquesLayer);
+            if (bloque != null)
             {
+                BloquesMoviles otro = bloque.GetComponent<BloquesMoviles>();
+
+                if (otro != null && !otro.isMoving)
+                {
+                    otro.StartCoroutine(otro.Deslizar(direccion));
+                }
+
                 break;
             }
 
@@ -110,7 +155,7 @@ public class BloquesMoviles : MonoBehaviour
                 }
             }
 
-            // 🟢 MOVER EXACTO
+            // 🟢 MOVIMIENTO PERFECTO EN GRILLA
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion * tileSize;
 
