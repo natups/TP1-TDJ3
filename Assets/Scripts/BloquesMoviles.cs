@@ -41,43 +41,18 @@ public class BloquesMoviles : MonoBehaviour
 
         Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-        // 🔴 SI HAY PARED → HACER MINI REBOTE (NO DESLIZA)
+        // 🧠 SI HAY PARED → EXPLOTA (NO REBOTA)
         if (HayAlgo(nextPos, paredesLayer))
         {
-            StartCoroutine(PequenoEmpujon(direccion));
+            Vector2 centro = transform.position;
+
+            ExplosionEnCruz(centro);
+
+            Destruir();
             return;
         }
 
-        // 🟢 SI NO → DESLIZA NORMAL
         StartCoroutine(Deslizar(direccion));
-    }
-
-    // =========================
-    IEnumerator PequenoEmpujon(Vector2 direccion)
-    {
-        Vector3 start = transform.position;
-        Vector3 end = start + (Vector3)direccion * (tileSize * 0.2f);
-
-        float t = 0f;
-        float duracion = 0.05f;
-
-        while (t < duracion)
-        {
-            t += Time.deltaTime;
-            transform.position = Vector3.Lerp(start, end, t / duracion);
-            yield return null;
-        }
-
-        t = 0f;
-
-        while (t < duracion)
-        {
-            t += Time.deltaTime;
-            transform.position = Vector3.Lerp(end, start, t / duracion);
-            yield return null;
-        }
-
-        transform.position = start;
     }
 
     // =========================
@@ -85,26 +60,16 @@ public class BloquesMoviles : MonoBehaviour
     {
         isMoving = true;
 
-        int rebotes = 0;
-
         while (true)
         {
             Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-            // 🔴 PARED (REBOTE REAL)
+            // 🧠 PARED → EXPLOSIÓN
             if (HayAlgo(nextPos, paredesLayer))
             {
-                if (rebotes < 1)
-                {
-                    Vector2 nuevaDir = ObtenerRebote(direccion);
+                Vector2 centro = transform.position;
 
-                    if (nuevaDir != Vector2.zero)
-                    {
-                        direccion = nuevaDir;
-                        rebotes++;
-                        continue;
-                    }
-                }
+                ExplosionEnCruz(centro);
 
                 Destruir();
                 break;
@@ -123,7 +88,7 @@ public class BloquesMoviles : MonoBehaviour
                 break;
             }
 
-            // 🔵 BLOQUE (EMPUJA SOLO AL ÚLTIMO)
+            // 🔵 BLOQUE
             Collider2D bloque = GetCollider(nextPos, bloquesLayer);
             if (bloque != null)
             {
@@ -155,7 +120,7 @@ public class BloquesMoviles : MonoBehaviour
                 }
             }
 
-            // 🟢 MOVIMIENTO PERFECTO EN GRILLA
+            // 🟢 MOVIMIENTO EN GRILLA
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion * tileSize;
 
@@ -175,6 +140,49 @@ public class BloquesMoviles : MonoBehaviour
     }
 
     // =========================
+    void ExplosionEnCruz(Vector2 centro)
+{
+    Vector2[] dirs =
+    {
+        Vector2.up,
+        Vector2.down,
+        Vector2.left,
+        Vector2.right
+    };
+
+    foreach (Vector2 dir in dirs)
+    {
+        Vector2 pos = centro + dir * tileSize;
+
+        // 🔥 primero intentamos detectar exactamente en el tile
+        Collider2D hit = Physics2D.OverlapPoint(pos);
+
+        if (hit == null)
+            continue;
+
+        // 👾 ENEMIGOS
+        MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
+        if (enemigo != null)
+        {
+            Destroy(enemigo.gameObject);
+
+            if (ui != null)
+                ui.SumarPuntos(100);
+
+            continue;
+        }
+
+        // 🔵 BLOQUES MOVILES
+        BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
+        if (bloque != null)
+        {
+            bloque.Destruir();
+            continue;
+        }
+    }
+}
+
+    // =========================
     bool HayAlgo(Vector2 pos, LayerMask layer)
     {
         return Physics2D.OverlapPoint(pos, layer) != null;
@@ -183,23 +191,6 @@ public class BloquesMoviles : MonoBehaviour
     Collider2D GetCollider(Vector2 pos, LayerMask layer)
     {
         return Physics2D.OverlapPoint(pos, layer);
-    }
-
-    // =========================
-    Vector2 ObtenerRebote(Vector2 direccion)
-    {
-        Vector2 derecha = new Vector2(direccion.y, -direccion.x);
-        Vector2 izquierda = new Vector2(-direccion.y, direccion.x);
-
-        Vector2 pos = transform.position;
-
-        if (!HayAlgo(pos + derecha * tileSize, paredesLayer))
-            return derecha;
-
-        if (!HayAlgo(pos + izquierda * tileSize, paredesLayer))
-            return izquierda;
-
-        return Vector2.zero;
     }
 
     // =========================
