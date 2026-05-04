@@ -92,19 +92,27 @@ public class MovimientoJugador : MonoBehaviour
             bloqueLayer
         );
 
-        Debug.Log("Hit: " + hit.collider);
+        Debug.Log("Hit: " + (hit.collider ? hit.collider.name : "NULL"));
 
-        if (hit.collider != null)
+        if (hit.collider == null) return;
+
+        // 🔵 BLOQUE MOVIL
+        BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
+        if (bloque != null)
         {
-            BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
-
-            if (bloque != null)
-            {
-                bloque.Empujar(direccion);
-            }
+            bloque.Empujar(direccion);
+            return;
         }
 
-        Debug.DrawRay(transform.position, direccion * interactDistance, Color.red, 1f);
+        // 🧊 DIAMANTE
+        BloqueDiamante diamante = hit.collider.GetComponent<BloqueDiamante>();
+        if (diamante != null)
+        {
+            diamante.RecibirImpacto(direccion, null);
+            return;
+        }
+
+        Debug.Log("No es bloque ni diamante");
     }
 
     void IntentarRomper()
