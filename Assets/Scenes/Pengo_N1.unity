@@ -4219,6 +4219,34 @@ PrefabInstance:
       propertyPath: todasLasCapas.m_Bits
       value: 2688
       objectReference: {fileID: 0}
+    - target: {fileID: 2343931987819232005, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 56765564375766265, guid: d200a0186c5c889429de637192ab33dc, type: 3}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_Size.x
+      value: 0.46932662
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_Size.y
+      value: 0.4158504
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.014292814
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.23793286
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124168143893232610, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6166245819168638305, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: m_Name
       value: Jugador
@@ -6505,7 +6533,7 @@ Animator:
   m_GameObject: {fileID: 702968554}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: dd401ecca3877d941be5b93e0576bfb9, type: 2}
+  m_Controller: {fileID: 9100000, guid: b37c692600af0724f922203f1fa17479, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
