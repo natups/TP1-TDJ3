@@ -9,6 +9,7 @@ public class MovimientoJugador : MonoBehaviour
     // interacción
     public float interactDistance = 1.5f;
     public LayerMask bloqueLayer;
+    public LayerMask diamanteLayer; 
     public int vidas = 3;
 
     private Vector2 lastDirection = Vector2.down;
@@ -85,18 +86,19 @@ public class MovimientoJugador : MonoBehaviour
     {
         Vector2 direccion = lastDirection;
 
+        int combinado = bloqueLayer | diamanteLayer;
+
         RaycastHit2D hit = Physics2D.Raycast(
             transform.position,
             direccion,
             interactDistance,
-            bloqueLayer
+            combinado
         );
 
         Debug.Log("Hit: " + (hit.collider ? hit.collider.name : "NULL"));
 
         if (hit.collider == null) return;
 
-        // 🔵 BLOQUE MOVIL
         BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
         if (bloque != null)
         {
@@ -104,15 +106,12 @@ public class MovimientoJugador : MonoBehaviour
             return;
         }
 
-        // 🧊 DIAMANTE
         BloqueDiamante diamante = hit.collider.GetComponent<BloqueDiamante>();
         if (diamante != null)
         {
             diamante.RecibirImpacto(direccion, null);
             return;
         }
-
-        Debug.Log("No es bloque ni diamante");
     }
 
     void IntentarRomper()

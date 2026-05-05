@@ -7,6 +7,7 @@ public class BloquesMoviles : MonoBehaviour
     public LayerMask bloquesLayer;
     public LayerMask paredesLayer;
     public LayerMask bloqueRompibleLayer;
+    public LayerMask diamanteLayer;
 
     public float slideSpeed = 6f;
     public float respawnTime = 8f;
@@ -23,7 +24,6 @@ public class BloquesMoviles : MonoBehaviour
         initialPosition = transform.position;
     }
 
-    // =========================
     Vector2 DireccionCardinal(Vector2 dir)
     {
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
@@ -32,72 +32,38 @@ public class BloquesMoviles : MonoBehaviour
             return new Vector2(0, Mathf.Sign(dir.y));
     }
 
-    // =========================
     public void Empujar(Vector2 direccion)
     {
         if (isMoving) return;
 
         direccion = DireccionCardinal(direccion);
-
         Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-        // 🔴 SI HAY PARED → HACER MINI REBOTE (NO DESLIZA)
         if (HayAlgo(nextPos, paredesLayer))
         {
-            StartCoroutine(PequenoEmpujon(direccion));
+            ExplosionEnCruz(transform.position);
+            Destruir();
             return;
         }
 
-        // 🟢 SI NO → DESLIZA NORMAL
-        StartCoroutine(Deslizar(direccion));
+        StartCoroutine(Deslizar(direccion, esUltimo: true));
     }
 
-    // =========================
-    IEnumerator PequenoEmpujon(Vector2 direccion)
-    {
-        Vector3 start = transform.position;
-        Vector3 end = start + (Vector3)direccion * (tileSize * 0.2f);
-
-        float t = 0f;
-        float duracion = 0.05f;
-
-        while (t < duracion)
-        {
-            t += Time.deltaTime;
-            transform.position = Vector3.Lerp(start, end, t / duracion);
-            yield return null;
-        }
-
-        t = 0f;
-
-        while (t < duracion)
-        {
-            t += Time.deltaTime;
-            transform.position = Vector3.Lerp(end, start, t / duracion);
-            yield return null;
-        }
-
-        transform.position = start;
-    }
-
-    // =========================
-    public IEnumerator Deslizar(Vector2 direccion)
+    public IEnumerator Deslizar(Vector2 direccion, bool esUltimo = true)
     {
         isMoving = true;
-
         int rebotes = 0;
 
         while (true)
         {
             Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-            // 🔴 PARED (REBOTE REAL)
+            // 🧱 PARED → REBOTE O EXPLOSIÓN
             if (HayAlgo(nextPos, paredesLayer))
             {
                 if (rebotes < 1)
                 {
                     Vector2 nuevaDir = ObtenerRebote(direccion);
-
                     if (nuevaDir != Vector2.zero)
                     {
                         direccion = nuevaDir;
@@ -105,6 +71,9 @@ public class BloquesMoviles : MonoBehaviour
                         continue;
                     }
                 }
+
+                if (esUltimo)
+                    ExplosionEnCruz(transform.position);
 
                 Destruir();
                 break;
@@ -115,25 +84,35 @@ public class BloquesMoviles : MonoBehaviour
             if (rompible != null)
             {
                 Destroy(rompible.gameObject);
-
-                if (ui != null)
-                    ui.SumarPuntos(50);
-
+                if (ui != null) ui.SumarPuntos(50);
+                if (esUltimo)
+                    ExplosionEnCruz(transform.position);
                 Destruir();
                 break;
             }
 
-            // 🔵 BLOQUE (EMPUJA SOLO AL ÚLTIMO)
+            // 💎 DIAMANTE
+            Collider2D diamanteCol = GetCollider(nextPos, diamanteLayer);
+            if (diamanteCol != null)
+            {
+                BloqueDiamante diamante = diamanteCol.GetComponent<BloqueDiamante>();
+                if (diamante != null)
+                {
+                    diamante.RecibirImpacto(direccion, gameObject);
+                    isMoving = false;
+                    yield break;
+                }
+            }
+
+            // 🔵 BLOQUE MOVIL
             Collider2D bloque = GetCollider(nextPos, bloquesLayer);
             if (bloque != null)
             {
                 BloquesMoviles otro = bloque.GetComponent<BloquesMoviles>();
-
                 if (otro != null && !otro.isMoving)
-                {
-                    otro.StartCoroutine(otro.Deslizar(direccion));
-                }
+                    otro.StartCoroutine(otro.Deslizar(direccion, esUltimo: true));
 
+                // este bloque para y ya no es el último
                 break;
             }
 
@@ -142,29 +121,24 @@ public class BloquesMoviles : MonoBehaviour
             if (hit != null)
             {
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
-
                 if (enemigo != null)
                 {
                     Destroy(enemigo.gameObject);
-
-                    if (ui != null)
-                        ui.SumarPuntos(100);
-
+                    if (ui != null) ui.SumarPuntos(100);
                     Destruir();
                     break;
                 }
             }
 
-            // 🟢 MOVIMIENTO PERFECTO EN GRILLA
+            // 🟢 MOVER
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direccion * tileSize;
+            float lerp = 0f;
 
-            float t = 0f;
-
-            while (t < 1f)
+            while (lerp < 1f)
             {
-                t += Time.deltaTime * slideSpeed;
-                transform.position = Vector3.Lerp(start, end, t);
+                lerp += Time.deltaTime * slideSpeed;
+                transform.position = Vector3.Lerp(start, end, lerp);
                 yield return null;
             }
 
@@ -174,7 +148,47 @@ public class BloquesMoviles : MonoBehaviour
         isMoving = false;
     }
 
-    // =========================
+    Vector2 ObtenerRebote(Vector2 direccion)
+    {
+        Vector2 derecha = new Vector2(direccion.y, -direccion.x);
+        Vector2 izquierda = new Vector2(-direccion.y, direccion.x);
+        Vector2 pos = transform.position;
+
+        if (!HayAlgo(pos + derecha * tileSize, paredesLayer))
+            return derecha;
+        if (!HayAlgo(pos + izquierda * tileSize, paredesLayer))
+            return izquierda;
+
+        return Vector2.zero;
+    }
+
+    void ExplosionEnCruz(Vector2 centro)
+    {
+        Vector2[] dirs = { Vector2.up, Vector2.down, Vector2.left, Vector2.right };
+
+        foreach (Vector2 dir in dirs)
+        {
+            Vector2 pos = centro + dir * tileSize;
+            Collider2D hit = Physics2D.OverlapPoint(pos);
+            if (hit == null) continue;
+
+            MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
+            if (enemigo != null)
+            {
+                Destroy(enemigo.gameObject);
+                if (ui != null) ui.SumarPuntos(100);
+                continue;
+            }
+
+            BloquesMoviles bloque = hit.GetComponent<BloquesMoviles>();
+            if (bloque != null)
+            {
+                bloque.Destruir();
+                continue;
+            }
+        }
+    }
+
     bool HayAlgo(Vector2 pos, LayerMask layer)
     {
         return Physics2D.OverlapPoint(pos, layer) != null;
@@ -185,24 +199,6 @@ public class BloquesMoviles : MonoBehaviour
         return Physics2D.OverlapPoint(pos, layer);
     }
 
-    // =========================
-    Vector2 ObtenerRebote(Vector2 direccion)
-    {
-        Vector2 derecha = new Vector2(direccion.y, -direccion.x);
-        Vector2 izquierda = new Vector2(-direccion.y, direccion.x);
-
-        Vector2 pos = transform.position;
-
-        if (!HayAlgo(pos + derecha * tileSize, paredesLayer))
-            return derecha;
-
-        if (!HayAlgo(pos + izquierda * tileSize, paredesLayer))
-            return izquierda;
-
-        return Vector2.zero;
-    }
-
-    // =========================
     public void Destruir()
     {
         StartCoroutine(Respawn());
@@ -212,11 +208,8 @@ public class BloquesMoviles : MonoBehaviour
     {
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
-
         yield return new WaitForSeconds(respawnTime);
-
         transform.position = initialPosition;
-
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Collider2D>().enabled = true;
     }

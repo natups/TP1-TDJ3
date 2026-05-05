@@ -111,7 +111,10 @@ MonoBehaviour:
   interactDistance: 1
   bloqueLayer:
     serializedVersion: 2
-    m_Bits: 1088
+    m_Bits: 64
+  diamanteLayer:
+    serializedVersion: 2
+    m_Bits: 1024
   vidas: 3
 --- !u!61 &3124168143893232610
 BoxCollider2D:
