@@ -3878,7 +3878,9 @@ MonoBehaviour:
   player: {fileID: 1178362962}
   vidaText: {fileID: 686967649}
   scoreText: {fileID: 1768735925}
+  timerText: {fileID: 165015691}
   score: 0
+  tiempoRestante: 120
 --- !u!4 &408986527
 Transform:
   m_ObjectHideFlags: 0
