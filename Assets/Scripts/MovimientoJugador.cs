@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using UnityEngine.Tilemaps;
 
 public class MovimientoJugador : MonoBehaviour
 {
@@ -6,86 +8,80 @@ public class MovimientoJugador : MonoBehaviour
     private Vector2 movement;
     private Animator animator;
 
-    // interacción
     public float interactDistance = 1.5f;
     public LayerMask bloqueLayer;
-    public LayerMask diamanteLayer; 
+    public LayerMask diamanteLayer;
     public int vidas = 3;
 
+    public Tilemap tilemap; // ← agregá este campo
+
+    // colocar bloques
+    public GameObject bloquePrefab;
+    public float cooldownColocar = 2f;
+    private float timerColocar = 0f;
+    public LayerMask todasLasCapas;
+
     private Vector2 lastDirection = Vector2.down;
+    private bool congelado = false;
 
     void Start()
     {
         animator = GetComponent<Animator>();
     }
-    
+
     public void RecibirDanio()
     {
-    vidas--;
-
-    Debug.Log("Vidas restantes: " + vidas);
-
-    if (vidas <= 0)
-    {
-        GameOver();
-    }
+        vidas--;
+        Debug.Log("Vidas restantes: " + vidas);
+        if (vidas <= 0)
+            GameOver();
     }
 
     void GameOver()
     {
-    Debug.Log("PERDISTE");
-    Time.timeScale = 0f;
+        Debug.Log("PERDISTE");
+        Time.timeScale = 0f;
     }
 
     void Update()
     {
-        // INPUT MOVIMIENTO
+        if (congelado) return;
+
+        timerColocar -= Time.deltaTime;
+
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        // evitar diagonales
         if (movement.x != 0)
             movement.y = 0;
 
-        // animación movimiento
         animator.SetFloat("MoveX", movement.x);
         animator.SetFloat("MoveY", movement.y);
         animator.SetFloat("Speed", movement.sqrMagnitude);
 
-        // guardar última dirección válida
         if (movement != Vector2.zero)
         {
             lastDirection = movement.normalized;
-
             animator.SetFloat("LastX", lastDirection.x);
             animator.SetFloat("LastY", lastDirection.y);
         }
 
-        // INPUT ACCIONES
         if (Input.GetKeyDown(KeyCode.J))
-        {
             IntentarEmpujar();
-        }
 
         if (Input.GetKeyDown(KeyCode.K))
-        {
-            IntentarRomper();
-        }
+            IntentarColocarBloque();
     }
 
     void FixedUpdate()
     {
+        if (congelado) return;
         transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
     }
-
-    // ------------------------
-    // INTERACCIÓN
-    // ------------------------
 
     void IntentarEmpujar()
     {
         Vector2 direccion = lastDirection;
-
         int combinado = bloqueLayer | diamanteLayer;
 
         RaycastHit2D hit = Physics2D.Raycast(
@@ -114,25 +110,52 @@ public class MovimientoJugador : MonoBehaviour
         }
     }
 
-    void IntentarRomper()
+    void IntentarColocarBloque()
     {
-        Vector2 direccion = lastDirection;
+        if (timerColocar > 0) return;
 
-        RaycastHit2D hit = Physics2D.Raycast(
-            transform.position,
-            direccion,
-            interactDistance,
-            bloqueLayer
-        );
+        // 🔲 alinear usando el Tilemap como referencia
+        Vector3Int cellPos = tilemap.WorldToCell(transform.position);
+        Vector3 posCentrada = tilemap.GetCellCenterWorld(cellPos);
 
-        if (hit.collider != null)
+        if (Physics2D.OverlapPoint(posCentrada, todasLasCapas)) return;
+
+        GameObject nuevo = Instantiate(bloquePrefab, posCentrada, Quaternion.identity);
+        StartCoroutine(AnimacionAparicion(nuevo));
+        timerColocar = cooldownColocar;
+    }
+
+    IEnumerator AnimacionAparicion(GameObject nuevoBloque)
+    {
+        SpriteRenderer sr = nuevoBloque.GetComponent<SpriteRenderer>();
+        Collider2D col = nuevoBloque.GetComponent<Collider2D>();
+
+        col.enabled = false;
+
+        // parpadeo durante 3 segundos
+        float tiempoTotal = 3f;
+        float tiempoTranscurrido = 0f;
+
+        while (tiempoTranscurrido < tiempoTotal)
         {
-            BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
-
-            if (bloque != null)
-            {
-                bloque.Destruir();
-            }
+            sr.enabled = !sr.enabled;
+            yield return new WaitForSeconds(0.15f);
+            tiempoTranscurrido += 0.15f;
         }
+
+        sr.enabled = true;
+        col.enabled = true;
+
+        // ❄ si el jugador sigue encima, se congela
+        if (Vector2.Distance(transform.position, nuevoBloque.transform.position) < 0.5f)
+            StartCoroutine(CongelarJugador(1.5f));
+    }
+
+    IEnumerator CongelarJugador(float duracion)
+    {
+        congelado = true;
+        animator.SetFloat("Speed", 0f);
+        yield return new WaitForSeconds(duracion);
+        congelado = false;
     }
 }

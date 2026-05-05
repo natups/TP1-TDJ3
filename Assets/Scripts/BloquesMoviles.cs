@@ -10,10 +10,8 @@ public class BloquesMoviles : MonoBehaviour
     public LayerMask diamanteLayer;
 
     public float slideSpeed = 6f;
-    public float respawnTime = 8f;
     public float tileSize = 1f;
 
-    private Vector3 initialPosition;
     public bool isMoving = false;
 
     private UIManager ui;
@@ -21,7 +19,6 @@ public class BloquesMoviles : MonoBehaviour
     void Start()
     {
         ui = FindAnyObjectByType<UIManager>();
-        initialPosition = transform.position;
     }
 
     Vector2 DireccionCardinal(Vector2 dir)
@@ -111,8 +108,6 @@ public class BloquesMoviles : MonoBehaviour
                 BloquesMoviles otro = bloque.GetComponent<BloquesMoviles>();
                 if (otro != null && !otro.isMoving)
                     otro.StartCoroutine(otro.Deslizar(direccion, esUltimo: true));
-
-                // este bloque para y ya no es el último
                 break;
             }
 
@@ -154,10 +149,12 @@ public class BloquesMoviles : MonoBehaviour
         Vector2 izquierda = new Vector2(-direccion.y, direccion.x);
         Vector2 pos = transform.position;
 
-        if (!HayAlgo(pos + derecha * tileSize, paredesLayer))
-            return derecha;
-        if (!HayAlgo(pos + izquierda * tileSize, paredesLayer))
-            return izquierda;
+        bool chequearDerechaPrimero = Random.value > 0.5f;
+        Vector2 primero = chequearDerechaPrimero ? derecha : izquierda;
+        Vector2 segundo = chequearDerechaPrimero ? izquierda : derecha;
+
+        if (!HayAlgo(pos + primero * tileSize, paredesLayer)) return primero;
+        if (!HayAlgo(pos + segundo * tileSize, paredesLayer)) return segundo;
 
         return Vector2.zero;
     }
@@ -201,16 +198,6 @@ public class BloquesMoviles : MonoBehaviour
 
     public void Destruir()
     {
-        StartCoroutine(Respawn());
-    }
-
-    IEnumerator Respawn()
-    {
-        GetComponent<SpriteRenderer>().enabled = false;
-        GetComponent<Collider2D>().enabled = false;
-        yield return new WaitForSeconds(respawnTime);
-        transform.position = initialPosition;
-        GetComponent<SpriteRenderer>().enabled = true;
-        GetComponent<Collider2D>().enabled = true;
+        Destroy(gameObject);
     }
 }

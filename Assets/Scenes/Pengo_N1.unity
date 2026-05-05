@@ -4202,8 +4202,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1332652737729119062, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: tilemap
+      value: 
+      objectReference: {fileID: 232554230}
+    - target: {fileID: 1332652737729119062, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: bloquePrefab
+      value: 
+      objectReference: {fileID: 4491320515116027812, guid: 63dc0d47487b3ee4ba2dd1609b014beb, type: 3}
+    - target: {fileID: 1332652737729119062, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: bloqueLayer.m_Bits
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1332652737729119062, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      propertyPath: todasLasCapas.m_Bits
+      value: 2688
       objectReference: {fileID: 0}
     - target: {fileID: 6166245819168638305, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: m_Name
