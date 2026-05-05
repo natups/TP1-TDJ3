@@ -4271,11 +4271,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3144193654058451461, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6166245819168638305, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1178362963}
   m_SourcePrefab: {fileID: 100100000, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+--- !u!1 &702968554 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6166245819168638305, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
+  m_PrefabInstance: {fileID: 702968553}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &734520672
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6480,12 +6489,34 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1332652737729119062, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
   m_PrefabInstance: {fileID: 702968553}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 702968554}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4ddbfd0487956744a2bc3e0af3ec00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
+--- !u!95 &1178362963
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 702968554}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: dd401ecca3877d941be5b93e0576bfb9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &1212963995
 PrefabInstance:
   m_ObjectHideFlags: 0
