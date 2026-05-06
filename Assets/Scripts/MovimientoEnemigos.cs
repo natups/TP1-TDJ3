@@ -34,15 +34,20 @@ public class MovimientoEnemigos : MonoBehaviour
         StartCoroutine(MoverEnGrilla());
     }
 
-    void OnDestroy()
+   void OnDestroy()
     {
         enemigosVivos--;
         todos.Remove(this);
 
+        // avisar al spawner
+        SpawnEnemigos spawner = FindAnyObjectByType<SpawnEnemigos>();
+        if (spawner != null)
+            spawner.EnemigoMurio();
+
         if (enemigosVivos <= 0)
         {
-            if (UIManager.Instance != null)
-                UIManager.Instance.Ganar();
+            Debug.Log("GANASTE");
+            Time.timeScale = 0f;
         }
     }
 
