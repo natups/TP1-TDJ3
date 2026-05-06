@@ -5,21 +5,19 @@ using UnityEngine.Tilemaps;
 
 public class MovimientoEnemigos : MonoBehaviour
 {
-    public float speed = 4f;
+    public float speed = 2f;
 
     public LayerMask obstaculosLayer;
     public LayerMask bloquesLayer;
-    public Tilemap tilemap; // ← asigná Suelo_Tilemap en el Inspector
+    public Tilemap tilemap;
 
     private Vector2 direction;
-    private bool isMoving = false;
+    public bool isMoving = false;
 
     private Animator animator;
 
-    // 🔵 LISTA GLOBAL
     private static List<MovimientoEnemigos> todos = new List<MovimientoEnemigos>();
 
-    // 🧊 STUN
     private bool estaAturdido = false;
     private float stunTimer = 0f;
 
@@ -31,7 +29,6 @@ public class MovimientoEnemigos : MonoBehaviour
         todos.Add(this);
         animator = GetComponent<Animator>();
 
-        // alinear a la grilla al inicio
         AlinearAGrilla();
         ChooseNewDirection();
         StartCoroutine(MoverEnGrilla());
@@ -55,6 +52,14 @@ public class MovimientoEnemigos : MonoBehaviour
         }
     }
 
+    void ActualizarAnimacion(Vector2 dir)
+    {
+        if (dir == Vector2.down)       animator.SetInteger("Direccion", 0);
+        else if (dir == Vector2.up)    animator.SetInteger("Direccion", 1);
+        else if (dir == Vector2.right) animator.SetInteger("Direccion", 2);
+        else if (dir == Vector2.left)  animator.SetInteger("Direccion", 3);
+    }
+
     IEnumerator MoverEnGrilla()
     {
         while (true)
@@ -62,8 +67,10 @@ public class MovimientoEnemigos : MonoBehaviour
             // 🧊 STUN
             if (estaAturdido)
             {
-                animator.SetFloat("MoveX", 0);
-                animator.SetFloat("MoveY", 0);
+                stunTimer -= Time.deltaTime;
+                if (stunTimer <= 0)
+                    estaAturdido = false;
+
                 yield return null;
                 continue;
             }
@@ -71,15 +78,16 @@ public class MovimientoEnemigos : MonoBehaviour
             Vector2 nextPos = (Vector2)transform.position + direction;
             int mask = obstaculosLayer | bloquesLayer;
 
-            // chequear si hay obstáculo
+            // chequear obstáculo
             if (Physics2D.OverlapPoint(nextPos, mask))
             {
                 ChooseNewDirection();
+                ActualizarAnimacion(direction);
                 yield return null;
                 continue;
             }
 
-            // chequear si hay bloque moviéndose
+            // chequear bloque en movimiento
             Collider2D bloqueCol = Physics2D.OverlapPoint(nextPos, bloquesLayer);
             if (bloqueCol != null)
             {
@@ -90,14 +98,14 @@ public class MovimientoEnemigos : MonoBehaviour
                     yield break;
                 }
                 ChooseNewDirection();
+                ActualizarAnimacion(direction);
                 yield return null;
                 continue;
             }
 
             // 🟢 MOVER tile por tile
             isMoving = true;
-            animator.SetFloat("MoveX", direction.x);
-            animator.SetFloat("MoveY", direction.y);
+            ActualizarAnimacion(direction);
 
             Vector3 start = transform.position;
             Vector3 end = start + (Vector3)direction;
@@ -113,9 +121,12 @@ public class MovimientoEnemigos : MonoBehaviour
             transform.position = end;
             isMoving = false;
 
-            // cambiar dirección aleatoriamente de vez en cuando
-            if (Random.value < 0.3f)
+            // cambiar dirección aleatoriamente
+            if (Random.value < 0.1f)
+            {
                 ChooseNewDirection();
+                ActualizarAnimacion(direction);
+            }
         }
     }
 
@@ -124,9 +135,7 @@ public class MovimientoEnemigos : MonoBehaviour
         if (animator != null)
             animator.SetTrigger("Morir");
 
-        // esperar que termine la animación de muerte
         yield return new WaitForSeconds(0.5f);
-
         Destroy(gameObject);
     }
 
