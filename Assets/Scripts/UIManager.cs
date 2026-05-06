@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
@@ -7,15 +8,21 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI vidaText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI unrafText; // ← el texto que parpadea
     public int score = 0;
 
-    public float tiempoRestante = 120f; // 2 minutos, ajustalo como quieras
+    public float tiempoRestante = 120f;
     private bool timerActivo = true;
+
+    void Start()
+    {
+        StartCoroutine(ParpadeaUnraf());
+    }
 
     void Update()
     {
-        vidaText.text = "Vidas: " + player.vidas;
-        scoreText.text = "SCORE: " + score;
+        vidaText.text = "x" + player.vidas;
+        scoreText.text = score.ToString("D6"); // muestra 06300 estilo arcade
 
         if (timerActivo)
         {
@@ -31,6 +38,15 @@ public class UIManager : MonoBehaviour
             int minutos = Mathf.FloorToInt(tiempoRestante / 60);
             int segundos = Mathf.FloorToInt(tiempoRestante % 60);
             timerText.text = string.Format("{0:00}:{1:00}", minutos, segundos);
+        }
+    }
+
+    IEnumerator ParpadeaUnraf()
+    {
+        while (true)
+        {
+            unrafText.enabled = !unrafText.enabled;
+            yield return new WaitForSeconds(0.6f);
         }
     }
 
