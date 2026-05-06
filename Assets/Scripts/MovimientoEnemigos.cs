@@ -34,12 +34,6 @@ public class MovimientoEnemigos : MonoBehaviour
         StartCoroutine(MoverEnGrilla());
     }
 
-    void AlinearAGrilla()
-    {
-        Vector3Int cellPos = tilemap.WorldToCell(transform.position);
-        transform.position = tilemap.GetCellCenterWorld(cellPos);
-    }
-
     void OnDestroy()
     {
         enemigosVivos--;
@@ -47,9 +41,17 @@ public class MovimientoEnemigos : MonoBehaviour
 
         if (enemigosVivos <= 0)
         {
-            Debug.Log("GANASTE");
-            Time.timeScale = 0f;
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.Ganar();
+            }
         }
+    }
+
+    void AlinearAGrilla()
+    {
+        Vector3Int cellPos = tilemap.WorldToCell(transform.position);
+        transform.position = tilemap.GetCellCenterWorld(cellPos);
     }
 
     void ActualizarAnimacion(Vector2 dir)
@@ -64,7 +66,6 @@ public class MovimientoEnemigos : MonoBehaviour
     {
         while (true)
         {
-            // 🧊 STUN
             if (estaAturdido)
             {
                 stunTimer -= Time.deltaTime;
@@ -78,7 +79,6 @@ public class MovimientoEnemigos : MonoBehaviour
             Vector2 nextPos = (Vector2)transform.position + direction;
             int mask = obstaculosLayer | bloquesLayer;
 
-            // chequear obstáculo
             if (Physics2D.OverlapPoint(nextPos, mask))
             {
                 ChooseNewDirection();
@@ -87,7 +87,6 @@ public class MovimientoEnemigos : MonoBehaviour
                 continue;
             }
 
-            // chequear bloque en movimiento
             Collider2D bloqueCol = Physics2D.OverlapPoint(nextPos, bloquesLayer);
             if (bloqueCol != null)
             {
@@ -97,13 +96,13 @@ public class MovimientoEnemigos : MonoBehaviour
                     StartCoroutine(Morir());
                     yield break;
                 }
+
                 ChooseNewDirection();
                 ActualizarAnimacion(direction);
                 yield return null;
                 continue;
             }
 
-            // 🟢 MOVER tile por tile
             isMoving = true;
             ActualizarAnimacion(direction);
 
@@ -121,7 +120,6 @@ public class MovimientoEnemigos : MonoBehaviour
             transform.position = end;
             isMoving = false;
 
-            // cambiar dirección aleatoriamente
             if (Random.value < 0.1f)
             {
                 ChooseNewDirection();

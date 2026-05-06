@@ -4,25 +4,51 @@ using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
+    [Header("Referencias")]
     public MovimientoJugador player;
+
     public TextMeshProUGUI vidaText;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI timerText;
-    public TextMeshProUGUI unrafText; // ← el texto que parpadea
-    public int score = 0;
+    public TextMeshProUGUI unrafText;
 
+    [Header("Panel Final")]
+    public GameObject panelFin;
+    public TextMeshProUGUI textoResultado;
+    public TextMeshProUGUI textoPuntajeFinal;
+
+    [Header("Gameplay")]
+    public int score = 0;
     public float tiempoRestante = 120f;
+
     private bool timerActivo = true;
+    private bool juegoTerminado = false;
+
+    void Awake()
+    {
+        // Singleton
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
 
     void Start()
     {
         StartCoroutine(ParpadeaUnraf());
+
+        if (panelFin != null)
+            panelFin.SetActive(false);
     }
 
     void Update()
     {
+        if (juegoTerminado) return;
+
         vidaText.text = "x" + player.vidas;
-        scoreText.text = score.ToString("D6"); // muestra 06300 estilo arcade
+        scoreText.text = score.ToString("D6");
 
         if (timerActivo)
         {
@@ -32,7 +58,7 @@ public class UIManager : MonoBehaviour
             {
                 tiempoRestante = 0;
                 timerActivo = false;
-                GameOver();
+                Perder();
             }
 
             int minutos = Mathf.FloorToInt(tiempoRestante / 60);
@@ -45,7 +71,9 @@ public class UIManager : MonoBehaviour
     {
         while (true)
         {
-            unrafText.enabled = !unrafText.enabled;
+            if (unrafText != null)
+                unrafText.enabled = !unrafText.enabled;
+
             yield return new WaitForSeconds(0.6f);
         }
     }
@@ -60,9 +88,43 @@ public class UIManager : MonoBehaviour
         tiempoRestante += segundos;
     }
 
-    void GameOver()
+    // =========================
+    // 🎯 FINAL DEL JUEGO
+    // =========================
+
+    public void Ganar()
     {
-        Debug.Log("TIEMPO AGOTADO - GAME OVER");
+        if (juegoTerminado) return;
+
+        juegoTerminado = true;
+        timerActivo = false;
+
+        if (panelFin != null) panelFin.SetActive(true);
+
+        if (textoResultado != null)
+            textoResultado.text = "GANASTE";
+
+        if (textoPuntajeFinal != null)
+            textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+
+        Time.timeScale = 0f;
+    }
+
+    public void Perder()
+    {
+        if (juegoTerminado) return;
+
+        juegoTerminado = true;
+        timerActivo = false;
+
+        if (panelFin != null) panelFin.SetActive(true);
+
+        if (textoResultado != null)
+            textoResultado.text = "PERDISTE";
+
+        if (textoPuntajeFinal != null)
+            textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+
         Time.timeScale = 0f;
     }
 }

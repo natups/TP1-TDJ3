@@ -13,9 +13,8 @@ public class MovimientoJugador : MonoBehaviour
     public LayerMask diamanteLayer;
     public int vidas = 3;
 
-    public Tilemap tilemap; // ← agregá este campo
+    public Tilemap tilemap;
 
-    // colocar bloques
     public GameObject bloquePrefab;
     public float cooldownColocar = 2f;
     private float timerColocar = 0f;
@@ -32,15 +31,14 @@ public class MovimientoJugador : MonoBehaviour
     public void RecibirDanio()
     {
         vidas--;
-        Debug.Log("Vidas restantes: " + vidas);
-        if (vidas <= 0)
-            GameOver();
-    }
 
-    void GameOver()
-    {
-        Debug.Log("PERDISTE");
-        Time.timeScale = 0f;
+        if (vidas <= 0)
+        {
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.Perder();
+            }
+        }
     }
 
     void Update()
@@ -91,8 +89,6 @@ public class MovimientoJugador : MonoBehaviour
             combinado
         );
 
-        Debug.Log("Hit: " + (hit.collider ? hit.collider.name : "NULL"));
-
         if (hit.collider == null) return;
 
         BloquesMoviles bloque = hit.collider.GetComponent<BloquesMoviles>();
@@ -114,7 +110,6 @@ public class MovimientoJugador : MonoBehaviour
     {
         if (timerColocar > 0) return;
 
-        // 🔲 alinear usando el Tilemap como referencia
         Vector3Int cellPos = tilemap.WorldToCell(transform.position);
         Vector3 posCentrada = tilemap.GetCellCenterWorld(cellPos);
 
@@ -132,7 +127,6 @@ public class MovimientoJugador : MonoBehaviour
 
         col.enabled = false;
 
-        // parpadeo durante 3 segundos
         float tiempoTotal = 3f;
         float tiempoTranscurrido = 0f;
 
@@ -146,7 +140,6 @@ public class MovimientoJugador : MonoBehaviour
         sr.enabled = true;
         col.enabled = true;
 
-        // ❄ si el jugador sigue encima, se congela
         if (Vector2.Distance(transform.position, nuevoBloque.transform.position) < 0.5f)
             StartCoroutine(CongelarJugador(1.5f));
     }

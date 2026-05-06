@@ -5,7 +5,7 @@ using System.Collections;
 
 public class MenuInicio : MonoBehaviour
 {
-    public TextMeshProUGUI enterText; // ← asigná el texto "PRESIONA ENTER PARA JUGAR"
+    public TextMeshProUGUI enterText; //
 
     void Start()
     {
