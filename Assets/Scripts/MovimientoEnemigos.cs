@@ -139,9 +139,9 @@ public class MovimientoEnemigos : MonoBehaviour
         Destroy(gameObject);
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        MovimientoJugador player = collision.gameObject.GetComponent<MovimientoJugador>();
+        MovimientoJugador player = other.GetComponent<MovimientoJugador>();
         if (player != null)
             player.RecibirDanio();
     }
