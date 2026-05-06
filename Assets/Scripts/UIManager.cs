@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour
     public GameObject panelFin;
     public TextMeshProUGUI textoResultado;
     public TextMeshProUGUI textoPuntajeFinal;
+    public TextMeshProUGUI textoInstrucciones;
 
     [Header("Gameplay")]
     public int score = 0;
@@ -28,7 +30,6 @@ public class UIManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton
         if (Instance == null)
             Instance = this;
         else
@@ -45,8 +46,19 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (juegoTerminado) return;
+        // 🎮 CONTROLES CUANDO TERMINA EL JUEGO
+        if (juegoTerminado)
+        {
+            if (Input.GetKeyDown(KeyCode.R))
+                Reintentar();
 
+            if (Input.GetKeyDown(KeyCode.Return))
+                VolverAlMenu();
+
+            return;
+        }
+
+        // UI normal
         vidaText.text = "x" + player.vidas;
         scoreText.text = score.ToString("D6");
 
@@ -99,13 +111,10 @@ public class UIManager : MonoBehaviour
         juegoTerminado = true;
         timerActivo = false;
 
-        if (panelFin != null) panelFin.SetActive(true);
-
-        if (textoResultado != null)
-            textoResultado.text = "GANASTE";
-
-        if (textoPuntajeFinal != null)
-            textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+        panelFin.SetActive(true);
+        textoResultado.text = "GANASTE";
+        textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+        textoInstrucciones.text = "R: Reintentar\nEnter: Volver al menú";
 
         Time.timeScale = 0f;
     }
@@ -117,14 +126,27 @@ public class UIManager : MonoBehaviour
         juegoTerminado = true;
         timerActivo = false;
 
-        if (panelFin != null) panelFin.SetActive(true);
-
-        if (textoResultado != null)
-            textoResultado.text = "PERDISTE";
-
-        if (textoPuntajeFinal != null)
-            textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+        panelFin.SetActive(true);
+        textoResultado.text = "PERDISTE";
+        textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+        textoInstrucciones.text = "R: Reintentar\nEnter: Volver al menú";
 
         Time.timeScale = 0f;
+    }
+
+    // =========================
+    // 🔄 ACCIONES
+    // =========================
+
+    void Reintentar()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    void VolverAlMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MenuInicio"); // 👈 CAMBIAR si tu escena tiene otro nombre
     }
 }

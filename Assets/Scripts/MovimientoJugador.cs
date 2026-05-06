@@ -35,9 +35,7 @@ public class MovimientoJugador : MonoBehaviour
         if (vidas <= 0)
         {
             if (UIManager.Instance != null)
-            {
                 UIManager.Instance.Perder();
-            }
         }
     }
 

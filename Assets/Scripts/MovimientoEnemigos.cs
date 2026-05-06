@@ -42,9 +42,7 @@ public class MovimientoEnemigos : MonoBehaviour
         if (enemigosVivos <= 0)
         {
             if (UIManager.Instance != null)
-            {
                 UIManager.Instance.Ganar();
-            }
         }
     }
 
