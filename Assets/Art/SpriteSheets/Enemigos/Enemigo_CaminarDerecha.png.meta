@@ -1,19 +1,19 @@
 fileFormatVersion: 2
-guid: de827710f9613ca4cb24d8727f4c56d8
+guid: 3db9c07b493b8954e8608efd9e69e998
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -153174165338082877
-    second: CaminarFren_0
+      213: -4926850859290664122
+    second: Enemigo_CaminarDerecha_0
   - first:
-      213: -2128094141283058622
-    second: CaminarFren_1
+      213: -6206927303269571634
+    second: Enemigo_CaminarDerecha_1
   - first:
-      213: -3009167530833035167
-    second: CaminarFren_2
+      213: 8889306414898232068
+    second: Enemigo_CaminarDerecha_2
   - first:
-      213: 3043518841501874066
-    second: CaminarFren_3
+      213: 6728826184934172975
+    second: Enemigo_CaminarDerecha_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -122,7 +122,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CaminarFren_0
+      name: Enemigo_CaminarDerecha_0
       rect:
         serializedVersion: 2
         x: 0
@@ -137,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3c1b14e78e0dfddf0800000000000000
-      internalID: -153174165338082877
+      spriteID: 643e6ae3f3f40abb0800000000000000
+      internalID: -4926850859290664122
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CaminarFren_1
+      name: Enemigo_CaminarDerecha_1
       rect:
         serializedVersion: 2
         x: 32
@@ -159,14 +159,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 24cbb3457ad7772e0800000000000000
-      internalID: -2128094141283058622
+      spriteID: ec3a1fdd0809cd9a0800000000000000
+      internalID: -6206927303269571634
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CaminarFren_2
+      name: Enemigo_CaminarDerecha_2
       rect:
         serializedVersion: 2
         x: 64
@@ -181,14 +181,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 160ce0fe21a4d36d0800000000000000
-      internalID: -3009167530833035167
+      spriteID: 40b3c9736192d5b70800000000000000
+      internalID: 8889306414898232068
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CaminarFren_3
+      name: Enemigo_CaminarDerecha_3
       rect:
         serializedVersion: 2
         x: 96
@@ -203,8 +203,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2977de6d240cc3a20800000000000000
-      internalID: 3043518841501874066
+      spriteID: f29295ca3c7916d50800000000000000
+      internalID: 6728826184934172975
       vertices: []
       indices: 
       edges: []
@@ -213,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5da0025035e9fef4f9ea54db9e15f5d5
+    spriteID: e10f3737c38e70343b167dc3634997ee
     internalID: 0
     vertices: []
     indices: 
@@ -225,10 +225,10 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      CaminarFren_0: -153174165338082877
-      CaminarFren_1: -2128094141283058622
-      CaminarFren_2: -3009167530833035167
-      CaminarFren_3: 3043518841501874066
+      Enemigo_CaminarDerecha_0: -4926850859290664122
+      Enemigo_CaminarDerecha_1: -6206927303269571634
+      Enemigo_CaminarDerecha_2: 8889306414898232068
+      Enemigo_CaminarDerecha_3: 6728826184934172975
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

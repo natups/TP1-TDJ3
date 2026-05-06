@@ -1,16 +1,19 @@
 fileFormatVersion: 2
-guid: 672beb6c1d7ee9b4b9c23c9729dcd4e4
+guid: 470dbd7c7c9b24b4bb2da66f6139aa20
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -84407192415819261
-    second: QuietoEspalda_0
+      213: -1586104620759326658
+    second: Enemigo_CaminarFrente_0
   - first:
-      213: -4485949057525458696
-    second: QuietoEspalda_1
+      213: -7313600522256618377
+    second: Enemigo_CaminarFrente_1
   - first:
-      213: -1639930091797158064
-    second: QuietoEspalda_2
+      213: -2454668835720378963
+    second: Enemigo_CaminarFrente_2
+  - first:
+      213: 7657371459333177816
+    second: Enemigo_CaminarFrente_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -119,67 +122,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: QuietoEspalda_0
+      name: Enemigo_CaminarFrente_0
       rect:
         serializedVersion: 2
-        x: 5
-        y: 2
-        width: 21
-        height: 27
+        x: 0
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 30a219f0b1024def0800000000000000
-      internalID: -84407192415819261
+      spriteID: e30e80f30460df9e0800000000000000
+      internalID: -1586104620759326658
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: QuietoEspalda_1
+      name: Enemigo_CaminarFrente_1
       rect:
         serializedVersion: 2
-        x: 37
-        y: 2
-        width: 21
-        height: 26
+        x: 32
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8f852b98915beb1c0800000000000000
-      internalID: -4485949057525458696
+      spriteID: 77c68c9f21fd08a90800000000000000
+      internalID: -7313600522256618377
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: QuietoEspalda_2
+      name: Enemigo_CaminarFrente_2
       rect:
         serializedVersion: 2
-        x: 69
-        y: 2
-        width: 21
-        height: 25
+        x: 64
+        y: 0
+        width: 32
+        height: 32
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 057e4fd254ccd39e0800000000000000
-      internalID: -1639930091797158064
+      spriteID: da54aa503b34fedd0800000000000000
+      internalID: -2454668835720378963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Enemigo_CaminarFrente_3
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d1c4c295c2744a60800000000000000
+      internalID: 7657371459333177816
       vertices: []
       indices: 
       edges: []
@@ -188,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: ebb63e36c708fb44b8d7646102fc6bb1
     internalID: 0
     vertices: []
     indices: 
@@ -196,11 +221,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":32.0,"y":32.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      QuietoEspalda_0: -84407192415819261
-      QuietoEspalda_1: -4485949057525458696
-      QuietoEspalda_2: -1639930091797158064
+      Enemigo_CaminarFrente_0: -1586104620759326658
+      Enemigo_CaminarFrente_1: -7313600522256618377
+      Enemigo_CaminarFrente_2: -2454668835720378963
+      Enemigo_CaminarFrente_3: 7657371459333177816
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
