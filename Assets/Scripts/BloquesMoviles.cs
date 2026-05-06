@@ -111,9 +111,10 @@ public class BloquesMoviles : MonoBehaviour
                 break;
             }
 
+
             // 👾 ENEMIGO
             Collider2D hit = Physics2D.OverlapPoint(nextPos);
-            if (hit != null)
+            if (hit != null && hit.GetComponent<MovimientoJugador>() == null)
             {
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
                 if (enemigo != null)
