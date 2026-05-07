@@ -6,21 +6,17 @@ using UnityEngine.Tilemaps;
 public class MovimientoEnemigos : MonoBehaviour
 {
     public float speed = 2f;
-
     public LayerMask obstaculosLayer;
     public LayerMask bloquesLayer;
     public Tilemap tilemap;
 
     private Vector2 direction;
     public bool isMoving = false;
-
     private Animator animator;
 
     private static List<MovimientoEnemigos> todos = new List<MovimientoEnemigos>();
-
     private bool estaAturdido = false;
     private float stunTimer = 0f;
-
     public static int enemigosVivos = 0;
 
     void Start()
@@ -29,20 +25,22 @@ public class MovimientoEnemigos : MonoBehaviour
         todos.Add(this);
         animator = GetComponent<Animator>();
 
+        if (tilemap == null)
+            tilemap = GameObject.Find("Suelo_Tilemap").GetComponent<Tilemap>();
+
         AlinearAGrilla();
         ChooseNewDirection();
         StartCoroutine(MoverEnGrilla());
     }
 
-   void OnDestroy()
+    void OnDestroy()
     {
         enemigosVivos--;
         todos.Remove(this);
 
-        // avisar al spawner
-        SpawnEnemigos spawner = FindAnyObjectByType<SpawnEnemigos>();
-        if (spawner != null)
-            spawner.EnemigoMurio();
+        SpawnManager sm = FindAnyObjectByType<SpawnManager>();
+        if (sm != null)
+            sm.EnemigoMurio();
 
         if (enemigosVivos <= 0)
         {
@@ -99,7 +97,6 @@ public class MovimientoEnemigos : MonoBehaviour
                     StartCoroutine(Morir());
                     yield break;
                 }
-
                 ChooseNewDirection();
                 ActualizarAnimacion(direction);
                 yield return null;
