@@ -55,7 +55,7 @@ public class BloquesMoviles : MonoBehaviour
         {
             Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
-            // 🧱 PARED → REBOTE O EXPLOSIÓN
+            // 🧱 PARED
             if (HayAlgo(nextPos, paredesLayer))
             {
                 if (rebotes < 1)
@@ -111,7 +111,6 @@ public class BloquesMoviles : MonoBehaviour
                 break;
             }
 
-
             // 👾 ENEMIGO
             Collider2D hit = Physics2D.OverlapPoint(nextPos);
             if (hit != null && hit.GetComponent<MovimientoJugador>() == null)
@@ -119,7 +118,7 @@ public class BloquesMoviles : MonoBehaviour
                 MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
                 if (enemigo != null)
                 {
-                    Destroy(enemigo.gameObject);
+                    enemigo.MorirPorBloque();
                     if (ui != null) ui.SumarPuntos(100);
                     Destruir();
                     break;
@@ -173,7 +172,7 @@ public class BloquesMoviles : MonoBehaviour
             MovimientoEnemigos enemigo = hit.GetComponent<MovimientoEnemigos>();
             if (enemigo != null)
             {
-                Destroy(enemigo.gameObject);
+                enemigo.MorirPorBloque();
                 if (ui != null) ui.SumarPuntos(100);
                 continue;
             }

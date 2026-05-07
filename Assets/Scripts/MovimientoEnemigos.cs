@@ -15,9 +15,12 @@ public class MovimientoEnemigos : MonoBehaviour
     private Animator animator;
 
     private static List<MovimientoEnemigos> todos = new List<MovimientoEnemigos>();
+    public static int enemigosVivos = 0;
+    private static bool appQuitting = false;
+    
     private bool estaAturdido = false;
     private float stunTimer = 0f;
-    public static int enemigosVivos = 0;
+    private bool yaMurio = false; 
 
     void Start()
     {
@@ -33,34 +36,52 @@ public class MovimientoEnemigos : MonoBehaviour
         StartCoroutine(MoverEnGrilla());
     }
 
-    void OnDestroy()
+    void OnApplicationQuit() { appQuitting = true; }
+
+    // Esta corrutina maneja la muerte visual y lógica
+    IEnumerator Morir()
     {
-        enemigosVivos--;
-        todos.Remove(this);
+        if (yaMurio) yield break;
+            yaMurio = true;
 
         SpawnManager sm = FindAnyObjectByType<SpawnManager>();
+        Debug.Log("SpawnManager encontrado: " + (sm != null ? "SI" : "NO")); // ← agregá esto
+
         if (sm != null)
             sm.EnemigoMurio();
 
-        if (enemigosVivos <= 0)
+        // 2. ACTUALIZAR ESTADOS INMEDIATAMENTE
+        enemigosVivos--;
+        todos.Remove(this);
+        isMoving = false;
+        estaAturdido = true; 
+
+        // 3. DISPARAR ANIMACIÓN
+        if (animator != null)
+            animator.SetTrigger("Morir");
+
+        // 4. CHEQUEAR VICTORIA
+        if (enemigosVivos <= 0 && (sm == null || !sm.HayEnemigosPendientes()))
         {
-            Debug.Log("GANASTE");
-            Time.timeScale = 0f;
+            if (UIManager.Instance != null)
+                UIManager.Instance.Ganar();
         }
+
+        // 5. ESPERAR ANIMACIÓN Y DESTRUIR
+        yield return new WaitForSeconds(0.8f);
+        Destroy(gameObject);
     }
 
-    void AlinearAGrilla()
+    void OnDestroy()
     {
-        Vector3Int cellPos = tilemap.WorldToCell(transform.position);
-        transform.position = tilemap.GetCellCenterWorld(cellPos);
-    }
-
-    void ActualizarAnimacion(Vector2 dir)
-    {
-        if (dir == Vector2.down)       animator.SetInteger("Direccion", 0);
-        else if (dir == Vector2.up)    animator.SetInteger("Direccion", 1);
-        else if (dir == Vector2.right) animator.SetInteger("Direccion", 2);
-        else if (dir == Vector2.left)  animator.SetInteger("Direccion", 3);
+        if (appQuitting) return;
+        
+        // Seguro por si el objeto se destruye por otra causa ajena a Morir()
+        if (!yaMurio)
+        {
+            enemigosVivos--;
+            todos.Remove(this);
+        }
     }
 
     IEnumerator MoverEnGrilla()
@@ -70,9 +91,7 @@ public class MovimientoEnemigos : MonoBehaviour
             if (estaAturdido)
             {
                 stunTimer -= Time.deltaTime;
-                if (stunTimer <= 0)
-                    estaAturdido = false;
-
+                if (stunTimer <= 0) estaAturdido = false;
                 yield return null;
                 continue;
             }
@@ -128,13 +147,19 @@ public class MovimientoEnemigos : MonoBehaviour
         }
     }
 
-    IEnumerator Morir()
+    void AlinearAGrilla()
     {
-        if (animator != null)
-            animator.SetTrigger("Morir");
+        Vector3Int cellPos = tilemap.WorldToCell(transform.position);
+        transform.position = tilemap.GetCellCenterWorld(cellPos);
+    }
 
-        yield return new WaitForSeconds(0.5f);
-        Destroy(gameObject);
+    void ActualizarAnimacion(Vector2 dir)
+    {
+        if (animator == null) return;
+        if (dir == Vector2.down)       animator.SetInteger("Direccion", 0);
+        else if (dir == Vector2.up)    animator.SetInteger("Direccion", 1);
+        else if (dir == Vector2.right) animator.SetInteger("Direccion", 2);
+        else if (dir == Vector2.left)  animator.SetInteger("Direccion", 3);
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -147,13 +172,10 @@ public class MovimientoEnemigos : MonoBehaviour
     void ChooseNewDirection()
     {
         int rand = Random.Range(0, 4);
-        switch (rand)
-        {
-            case 0: direction = Vector2.up; break;
-            case 1: direction = Vector2.down; break;
-            case 2: direction = Vector2.left; break;
-            case 3: direction = Vector2.right; break;
-        }
+        if (rand == 0) direction = Vector2.up;
+        else if (rand == 1) direction = Vector2.down;
+        else if (rand == 2) direction = Vector2.left;
+        else direction = Vector2.right;
     }
 
     public void Stun(float duration)
@@ -162,12 +184,12 @@ public class MovimientoEnemigos : MonoBehaviour
         stunTimer = duration;
     }
 
+    public void MorirPorBloque()
+    {
+        StartCoroutine(Morir());
+    }
     public static void StunAll(float duration)
     {
-        foreach (var e in todos)
-        {
-            if (e != null)
-                e.Stun(duration);
-        }
+        foreach (var e in todos) { if (e != null) e.Stun(duration); }
     }
 }

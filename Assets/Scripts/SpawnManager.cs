@@ -5,34 +5,54 @@ public class SpawnManager : MonoBehaviour
 {
     public GameObject enemigoPrefab;
     public float tiempoRespawn = 5f;
-    public int maxEnemigos = 6;
+    public int maxEnemigosEnPantalla = 6; 
+    public int totalEnemigosPorNivel = 6; 
     public Transform[] puntosDeSpawn;
+
+    [Header("Seguimiento")]
+    public int enemigosYaGenerados = 3; 
+    private int enemigosEnCamino = 0;
 
     public void EnemigoMurio()
     {
-        if (MovimientoEnemigos.enemigosVivos < maxEnemigos)
+        Debug.Log("EnemigoMurio llamado! YaGenerados: " + enemigosYaGenerados + " Total: " + totalEnemigosPorNivel);
+        
+        if (enemigosYaGenerados < totalEnemigosPorNivel)
+        {
+            enemigosYaGenerados++;
             StartCoroutine(RespawnEnemigo());
+        }
+    }
+    public bool HayEnemigosPendientes()
+    {
+        return enemigosEnCamino > 0 || enemigosYaGenerados < totalEnemigosPorNivel;
     }
 
     IEnumerator RespawnEnemigo()
     {
+        enemigosEnCamino++;
+        
         yield return new WaitForSeconds(tiempoRespawn);
 
-        if (MovimientoEnemigos.enemigosVivos >= maxEnemigos) yield break;
-
+        // Elegimos un punto al azar de la lista
         Transform punto = puntosDeSpawn[Random.Range(0, puntosDeSpawn.Length)];
         GameObject nuevoEnemigo = Instantiate(enemigoPrefab, punto.position, Quaternion.identity);
 
+        enemigosEnCamino--;
+
+        // --- Lógica visual de parpadeo al aparecer ---
         SpriteRenderer sr = nuevoEnemigo.GetComponent<SpriteRenderer>();
         Collider2D col = nuevoEnemigo.GetComponent<Collider2D>();
-
-        col.enabled = false;
+        
+        if (col != null) col.enabled = false;
+        
         for (int i = 0; i < 6; i++)
         {
-            sr.enabled = !sr.enabled;
+            if (sr != null) sr.enabled = !sr.enabled;
             yield return new WaitForSeconds(0.2f);
         }
-        sr.enabled = true;
-        col.enabled = true;
+        
+        if (sr != null) sr.enabled = true;
+        if (col != null) col.enabled = true;
     }
 }

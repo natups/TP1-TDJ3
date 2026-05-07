@@ -4728,11 +4728,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8687926626151313356, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8.46
+      value: -2.46
       objectReference: {fileID: 0}
     - target: {fileID: 8687926626151313356, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.84
+      value: 0.92
       objectReference: {fileID: 0}
     - target: {fileID: 8687926626151313356, guid: de0585ad157aa74419b15ede03f3ae56, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8610,7 +8610,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SpawnManager
   enemigoPrefab: {fileID: 4693940365290927744, guid: e7ae4a4c6aa5998489cf84c050473df2, type: 3}
   tiempoRespawn: 5
-  maxEnemigos: 6
+  maxEnemigosEnPantalla: 3
+  totalEnemigosPorNivel: 6
   puntosDeSpawn:
   - {fileID: 1407722580}
   - {fileID: 1498410456}
@@ -8618,6 +8619,7 @@ MonoBehaviour:
   - {fileID: 1816757907}
   - {fileID: 903348036}
   - {fileID: 465970210}
+  enemigosYaGenerados: 3
 --- !u!4 &1932873138
 Transform:
   m_ObjectHideFlags: 0
