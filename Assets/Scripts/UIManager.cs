@@ -38,6 +38,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f; 
         StartCoroutine(ParpadeaUnraf());
 
         if (panelFin != null)
@@ -46,7 +47,6 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        // 🎮 CONTROLES CUANDO TERMINA EL JUEGO
         if (juegoTerminado)
         {
             if (Input.GetKeyDown(KeyCode.R))
@@ -58,8 +58,9 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // UI normal
-        vidaText.text = "x" + player.vidas;
+        if (player != null)
+            vidaText.text = "x" + player.vidas;
+            
         scoreText.text = score.ToString("D6");
 
         if (timerActivo)
@@ -86,7 +87,7 @@ public class UIManager : MonoBehaviour
             if (unrafText != null)
                 unrafText.enabled = !unrafText.enabled;
 
-            yield return new WaitForSeconds(0.6f);
+            yield return new WaitForSecondsRealtime(0.6f);
         }
     }
 
@@ -95,48 +96,39 @@ public class UIManager : MonoBehaviour
         score += puntos;
     }
 
+    // --- FUNCIÓN RESTAURADA PARA EL ITEM.CS ---
     public void AgregarTiempo(float segundos)
     {
         tiempoRestante += segundos;
     }
 
-    // =========================
-    // 🎯 FINAL DEL JUEGO
-    // =========================
-
     public void Ganar()
     {
         if (juegoTerminado) return;
-
-        juegoTerminado = true;
-        timerActivo = false;
-
-        panelFin.SetActive(true);
-        textoResultado.text = "GANASTE";
-        textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
-        textoInstrucciones.text = "R: Reintentar\nEnter: Volver al menú";
-
-        Time.timeScale = 0f;
+        FinalizarPartida("GANASTE");
     }
 
     public void Perder()
     {
         if (juegoTerminado) return;
+        FinalizarPartida("PERDISTE");
+    }
 
+    private void FinalizarPartida(string mensaje)
+    {
         juegoTerminado = true;
         timerActivo = false;
 
-        panelFin.SetActive(true);
-        textoResultado.text = "PERDISTE";
-        textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
-        textoInstrucciones.text = "R: Reintentar\nEnter: Volver al menú";
+        if (panelFin != null)
+        {
+            panelFin.SetActive(true);
+            textoResultado.text = mensaje;
+            textoPuntajeFinal.text = "PUNTAJE: " + score.ToString("D6");
+            textoInstrucciones.text = "R: Reintentar\nEnter: Volver al menú";
+        }
 
-        Time.timeScale = 0f;
+        Time.timeScale = 0f; 
     }
-
-    // =========================
-    // 🔄 ACCIONES
-    // =========================
 
     void Reintentar()
     {
@@ -147,6 +139,6 @@ public class UIManager : MonoBehaviour
     void VolverAlMenu()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("MenuInicio"); // 👈 CAMBIAR si tu escena tiene otro nombre
+        SceneManager.LoadScene("MenuInicio"); 
     }
 }

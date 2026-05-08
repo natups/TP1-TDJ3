@@ -31,7 +31,7 @@ public class MovimientoJugador : MonoBehaviour
 
     public void RecibirDanio()
     {
-        if (esInvencible) return;
+        if (esInvencible || vidas <= 0) return;
 
         vidas--;
 
@@ -51,27 +51,27 @@ public class MovimientoJugador : MonoBehaviour
         esInvencible = true;
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
 
-        for (int i = 0; i < 8; i++)
+        // Parpadeo más rápido para evitar bugs en la Build (1.2 segundos total)
+        for (int i = 0; i < 6; i++)
         {
-            sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.5f);
+            if (sr != null) sr.enabled = !sr.enabled;
+            yield return new WaitForSeconds(0.2f);
         }
 
-        sr.enabled = true;
+        if (sr != null) sr.enabled = true;
         esInvencible = false;
     }
 
     void Update()
     {
-        if (congelado) return;
+        if (congelado || Time.timeScale == 0f) return;
 
         timerColocar -= Time.deltaTime;
 
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
-        if (movement.x != 0)
-            movement.y = 0;
+        if (movement.x != 0) movement.y = 0;
 
         animator.SetFloat("MoveX", movement.x);
         animator.SetFloat("MoveY", movement.y);
@@ -93,7 +93,7 @@ public class MovimientoJugador : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (congelado) return;
+        if (congelado || Time.timeScale == 0f) return;
         transform.position += (Vector3)movement * moveSpeed * Time.fixedDeltaTime;
     }
 
@@ -102,12 +102,7 @@ public class MovimientoJugador : MonoBehaviour
         Vector2 direccion = lastDirection;
         int combinado = bloqueLayer | diamanteLayer;
 
-        RaycastHit2D hit = Physics2D.Raycast(
-            transform.position,
-            direccion,
-            interactDistance,
-            combinado
-        );
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direccion, interactDistance, combinado);
 
         if (hit.collider == null) return;
 
@@ -144,24 +139,23 @@ public class MovimientoJugador : MonoBehaviour
     {
         SpriteRenderer sr = nuevoBloque.GetComponent<SpriteRenderer>();
         Collider2D col = nuevoBloque.GetComponent<Collider2D>();
-
         col.enabled = false;
 
-        float tiempoTotal = 3f;
+        float tiempoTotal = 1.5f; // Reducido para agilizar gameplay
         float tiempoTranscurrido = 0f;
 
         while (tiempoTranscurrido < tiempoTotal)
         {
-            sr.enabled = !sr.enabled;
+            if (sr != null) sr.enabled = !sr.enabled;
             yield return new WaitForSeconds(0.15f);
             tiempoTranscurrido += 0.15f;
         }
 
-        sr.enabled = true;
-        col.enabled = true;
+        if (sr != null) sr.enabled = true;
+        if (col != null) col.enabled = true;
 
         if (Vector2.Distance(transform.position, nuevoBloque.transform.position) < 0.5f)
-            StartCoroutine(CongelarJugador(1.5f));
+            StartCoroutine(CongelarJugador(1.0f));
     }
 
     IEnumerator CongelarJugador(float duracion)
