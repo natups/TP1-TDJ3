@@ -7,6 +7,7 @@ public class BloquesMoviles : MonoBehaviour
     public LayerMask bloquesLayer;
     public LayerMask paredesLayer;
     public LayerMask bloqueRompibleLayer;
+    public LayerMask obstaculosLayer;
     public LayerMask diamanteLayer;
 
     public float slideSpeed = 6f;
@@ -56,7 +57,8 @@ public class BloquesMoviles : MonoBehaviour
             Vector2 nextPos = (Vector2)transform.position + direccion * tileSize;
 
             // 🧱 PARED
-            if (HayAlgo(nextPos, paredesLayer))
+            // 🧱 PARED U OBSTÁCULO
+            if (HayAlgo(nextPos, paredesLayer) || HayAlgo(nextPos, obstaculosLayer))
             {
                 if (rebotes < 1)
                 {

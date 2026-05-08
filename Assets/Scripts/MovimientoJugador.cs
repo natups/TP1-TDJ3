@@ -22,6 +22,7 @@ public class MovimientoJugador : MonoBehaviour
 
     private Vector2 lastDirection = Vector2.down;
     private bool congelado = false;
+    private bool esInvencible = false;
 
     void Start()
     {
@@ -30,6 +31,8 @@ public class MovimientoJugador : MonoBehaviour
 
     public void RecibirDanio()
     {
+        if (esInvencible) return;
+
         vidas--;
 
         if (vidas <= 0)
@@ -37,6 +40,25 @@ public class MovimientoJugador : MonoBehaviour
             if (UIManager.Instance != null)
                 UIManager.Instance.Perder();
         }
+        else
+        {
+            StartCoroutine(Parpadear());
+        }
+    }
+
+    IEnumerator Parpadear()
+    {
+        esInvencible = true;
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+
+        for (int i = 0; i < 8; i++)
+        {
+            sr.enabled = !sr.enabled;
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        sr.enabled = true;
+        esInvencible = false;
     }
 
     void Update()

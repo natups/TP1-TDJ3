@@ -49,7 +49,7 @@ public class SpawnManager : MonoBehaviour
         for (int i = 0; i < 6; i++)
         {
             if (sr != null) sr.enabled = !sr.enabled;
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
         }
         
         if (sr != null) sr.enabled = true;

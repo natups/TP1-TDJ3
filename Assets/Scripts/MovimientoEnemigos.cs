@@ -39,36 +39,29 @@ public class MovimientoEnemigos : MonoBehaviour
     void OnApplicationQuit() { appQuitting = true; }
 
     // Esta corrutina maneja la muerte visual y lógica
-    IEnumerator Morir()
+  IEnumerator Morir()
     {
         if (yaMurio) yield break;
-            yaMurio = true;
+        yaMurio = true;
 
         SpawnManager sm = FindAnyObjectByType<SpawnManager>();
-        Debug.Log("SpawnManager encontrado: " + (sm != null ? "SI" : "NO")); // ← agregá esto
-
         if (sm != null)
             sm.EnemigoMurio();
 
-        // 2. ACTUALIZAR ESTADOS INMEDIATAMENTE
         enemigosVivos--;
         todos.Remove(this);
         isMoving = false;
-        estaAturdido = true; 
 
-        // 3. DISPARAR ANIMACIÓN
+        // usar SetInteger en vez de trigger
         if (animator != null)
-            animator.SetTrigger("Morir");
+            animator.SetInteger("Direccion", 4);
 
-        // 4. CHEQUEAR VICTORIA
+        yield return new WaitForSeconds(1.5f);
+
         if (enemigosVivos <= 0 && (sm == null || !sm.HayEnemigosPendientes()))
-        {
             if (UIManager.Instance != null)
                 UIManager.Instance.Ganar();
-        }
 
-        // 5. ESPERAR ANIMACIÓN Y DESTRUIR
-        yield return new WaitForSeconds(0.8f);
         Destroy(gameObject);
     }
 
@@ -184,12 +177,18 @@ public class MovimientoEnemigos : MonoBehaviour
         stunTimer = duration;
     }
 
-    public void MorirPorBloque()
-    {
-        StartCoroutine(Morir());
-    }
     public static void StunAll(float duration)
     {
-        foreach (var e in todos) { if (e != null) e.Stun(duration); }
+        foreach (var e in todos)
+        {
+            if (e != null)
+                e.Stun(duration);
+        }
+    }
+    public void MorirPorBloque()
+    {
+        if (yaMurio) return;
+        StopAllCoroutines(); // ← frena el movimiento
+        StartCoroutine(Morir()); // ← Morir() se encarga de setear yaMurio
     }
 }

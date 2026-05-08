@@ -188,10 +188,12 @@ MonoBehaviour:
   bloqueRompibleLayer:
     serializedVersion: 2
     m_Bits: 2048
+  obstaculosLayer:
+    serializedVersion: 2
+    m_Bits: 128
   diamanteLayer:
     serializedVersion: 2
     m_Bits: 1024
   slideSpeed: 6
-  respawnTime: 3
   tileSize: 1
   isMoving: 0
